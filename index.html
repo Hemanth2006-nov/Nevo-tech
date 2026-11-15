@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEVO TECH — Building Digital Solutions for a Smarter Tomorrow</title>
+  <meta name="description" content="NEVO TECH is a modern technology company helping businesses build, automate and grow through software, AI and cloud solutions.">
+  <link rel="icon" type="image/png" href="assets/nevo-logo-mark.png">
+  
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="styles.css?v=2.4">
+
+  <!-- Three.js from Cloudflare CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- Lenis Smooth Scroll CDN -->
+  <!-- High-Performance Lenis Smooth Inertial Scroll (Locally Bundled) -->
+  <script src="assets/lenis.min.js"></script>
+  <!-- Canvas Confetti CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+
+  <!-- =================================================================
+       STYLISH SMOOTH PRELOADER (NEVO TECH INTRO)
+       ================================================================= -->
+  <div id="nevo-preloader" class="nevo-preloader">
+    <div class="preloader-bg-particles"></div>
+    <div class="preloader-ambient-glow"></div>
+    <div class="preloader-grid-lines"></div>
+    
+    <div class="preloader-content">
+      <!-- 3D NEVO Logo Emblem -->
+      <div class="preloader-logo-wrap">
+        <div class="preloader-logo-ring"></div>
+        <div class="preloader-logo-ring-outer"></div>
+        <img src="assets/nevo-logo-mark.png" alt="NEVO TECH Logo" class="preloader-logo-img">
+      </div>
+
+      <!-- Animated NEVO TECH Typography matching Brand Lockup -->
+      <div class="preloader-brand">
+        <h1 class="preloader-nevo-text">
+          <span class="preloader-word-nevo">NEVO</span>
+          <span class="preloader-word-tech">TECH</span>
+        </h1>
+      </div>
+
+      <!-- Loading Progress Bar & Percentage -->
+      <div class="preloader-progress-container">
+        <div class="preloader-track">
+          <div id="preloader-bar" class="preloader-bar"></div>
+        </div>
+        <div class="preloader-status-row">
+          <span id="preloader-status" class="preloader-status-text">INITIALIZING CORE...</span>
+          <span id="preloader-percent" class="preloader-percent">0%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Immediate Preloader Execution Script -->
+    <script>
+      (function() {
+        const preloader = document.getElementById('nevo-preloader');
+        const bar = document.getElementById('preloader-bar');
+        const pct = document.getElementById('preloader-percent');
+        const status = document.getElementById('preloader-status');
+        if (!preloader) return;
+
+        if (window.location.search.includes('skip-intro')) {
+          preloader.style.display = 'none';
+          document.body.classList.remove('preloader-active');
+          return;
+        }
+
+        document.body.classList.add('preloader-active');
+
+        const messages = [
+          { at: 0, text: "INITIALIZING NEURAL CORE..." },
+          { at: 22, text: "SYNCHRONIZING 3D ENVIRONMENT..." },
+          { at: 50, text: "CALIBRATING TILT & LIGHTING..." },
+          { at: 75, text: "DEPLOYING HIGH-PERFORMANCE MESH..." },
+          { at: 98, text: "SYSTEM READY — WELCOME TO NEVO" }
+        ];
+
+        const duration = 2400; // 2.4s stylish, smooth cinematic build-up
+        let startTimestamp = null;
+
+        function runPreloaderStep(now) {
+          if (!startTimestamp) startTimestamp = now;
+          const elapsed = now - startTimestamp;
+          const progress = Math.min(elapsed / duration, 1);
+          // EaseOutQuart curve
+          const eased = 1 - Math.pow(1 - progress, 4);
+          const currentPct = Math.floor(eased * 100);
+
+          if (bar) bar.style.width = currentPct + '%';
+          if (pct) pct.textContent = currentPct + '%';
+
+          if (status) {
+            for (let i = messages.length - 1; i >= 0; i--) {
+              if (currentPct >= messages[i].at) {
+                status.textContent = messages[i].text;
+                break;
+              }
+            }
+          }
+
+          if (progress < 1) {
+            requestAnimationFrame(runPreloaderStep);
+          } else {
+            setTimeout(function() {
+              preloader.classList.add('loaded');
+              document.body.classList.remove('preloader-active');
+              if (window.playSfx) window.playSfx('success');
+            }, 350);
+          }
+        }
+
+        requestAnimationFrame(runPreloaderStep);
+
+        window.replayIntro = function() {
+          if (!preloader) return;
+          preloader.classList.remove('loaded');
+          document.body.classList.add('preloader-active');
+          if (bar) bar.style.width = '0%';
+          if (pct) pct.textContent = '0%';
+          if (status) status.textContent = messages[0].text;
+          startTimestamp = null;
+          requestAnimationFrame(runPreloaderStep);
+        };
+      })();
+    </script>
+  </div>
+
+  <!-- Glowing Scroll Progress Line -->
+  <div class="scroll-progress-line" id="scroll-progress-line"></div>
+
+  <!-- Floating Back to Top Button -->
+  <!-- Advanced Circular Scroll Progress & Back to Top Button -->
+  <button class="back-to-top" id="back-to-top-btn" aria-label="Scroll Back to Top" title="Back to Top">
+    <svg class="progress-ring" width="48" height="48" viewBox="0 0 48 48" aria-hidden="true">
+      <circle class="progress-ring__circle-bg" stroke="rgba(255, 255, 255, 0.12)" stroke-width="3" fill="transparent" r="20" cx="24" cy="24"/>
+      <circle class="progress-ring__circle" id="scroll-progress-circle" stroke="url(#progress-gradient)" stroke-width="3.2" stroke-linecap="round" fill="transparent" r="20" cx="24" cy="24"/>
+      <defs>
+        <linearGradient id="progress-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#38bdf8"/>
+          <stop offset="100%" stop-color="#25d366"/>
+        </linearGradient>
+      </defs>
+    </svg>
+    <span class="back-to-top-arrow">↑</span>
+  </button>
+
+  <!-- =================================================================
+       NAVIGATION BAR
+       ================================================================= -->
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a href="#home" class="brand-logo" onclick="replayIntro()" title="Click to replay NEVO intro animation">
+        <div class="brand-icon">
+          <img src="assets/nevo-logo-mark.png" alt="NEVO TECH Logo" class="brand-logo-mark">
+        </div>
+        <div class="brand-text brand-text-inline">
+          <span class="brand-name">NEVO</span>
+          <span class="brand-sub">TECH</span>
+        </div>
+      </a>
+
+      <nav>
+        <ul class="nav-menu">
+          <li><a href="#home" class="nav-link active">Home</a></li>
+          <li class="nav-item-dropdown">
+            <a href="#services" class="nav-link">Services ▾</a>
+            <ul class="nav-dropdown">
+              <li><a href="service-technical-internships.html" class="nav-dropdown-link"><span>&lt;/&gt;</span> Technical Internship Programs</a></li>
+              <li><a href="service-business-analytics-internship.html" class="nav-dropdown-link"><span>📊</span> Business &amp; Analytics Internship</a></li>
+              <li><a href="service-custom-projects-documentation.html" class="nav-dropdown-link"><span>🛠️</span> Customized Technical Projects &amp; Documentation</a></li>
+              <li><a href="service-survey-research-reports.html" class="nav-dropdown-link"><span>📋</span> Survey-Based Projects &amp; Research Reports</a></li>
+            </ul>
+          </li>
+          <li><a href="#about" class="nav-link">About</a></li>
+          <li><a href="#projects" class="nav-link">Our Work</a></li>
+          <li><a href="#process" class="nav-link">Process</a></li>
+          <li><a href="#industries" class="nav-link">Industries</a></li>
+          <li><a href="#testimonials" class="nav-link">Reviews</a></li>
+          <li><a href="#contact" class="nav-link">Contact</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="https://wa.me/919976543210?text=Hi%20NEVO%20TECH%2C%20I%20would%20like%20to%20enquire%20about%20your%20services%20and%20programs." target="_blank" rel="noopener noreferrer" class="btn-whatsapp nav-whatsapp-btn" title="Enquire on WhatsApp">
+          <svg xmlns="http://www.w3.org/2000/svg" class="whatsapp-icon" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.016-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/></svg>
+          <span>WhatsApp Enquiry</span>
+        </a>
+
+        <!-- Mobile Menu Toggle -->
+        <button class="mobile-toggle" aria-label="Open Navigation Menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- =================================================================
+       HERO SECTION (Clean Cyber Grid & Ice-Blue Atmosphere)
+       ================================================================= -->
+  <section id="home" class="hero-section">
+    <div class="hero-bg-glow"></div>
+    <div class="hero-grid-pattern"></div>
+
+    <div class="container">
+      <div class="hero-grid">
+        <div class="hero-content">
+          <div class="hero-brand-showcase">
+            <img src="assets/nevo-logo.png" alt="NEVO TECH Logo" class="hero-brand-logo-img">
+          </div>
+
+          <div class="hero-badge-pill">
+            <span class="hero-badge-dot"></span>
+            <span>INTERNSHIPS | TECHNICAL PROJECTS | RESEARCH</span>
+          </div>
+
+          <h1 class="hero-title">
+            Building Industry-Ready Skills &amp; <span class="hero-title-highlight">Technical Excellence</span>
+          </h1>
+
+          <p class="hero-description">
+            Empowering students, engineers, and researchers through hands-on technical internships, analytics mentorship, customized project development, and empirical survey research.
+          </p>
+
+          <div class="hero-cta-group">
+            <a href="#services" class="btn-pill-highlight">
+              Explore Our Services →
+            </a>
+            <button id="open-story-modal" class="btn-pill-dark">
+              <span class="play-icon-badge">▶</span>
+              <span>Watch Our Story</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Floating 3D Stats Bar below Hero -->
+      <div class="hero-stats-bar">
+        <div class="stat-item">
+          <div class="stat-icon">🎓</div>
+          <div class="stat-info">
+            <span class="stat-number" data-target="500" data-suffix="+">500+</span>
+            <span class="stat-label">Interns Mentored</span>
+          </div>
+        </div>
+
+        <div class="stat-item">
+          <div class="stat-icon">&lt;/&gt;</div>
+          <div class="stat-info">
+            <span class="stat-number" data-target="120" data-suffix="+">120+</span>
+            <span class="stat-label">Projects &amp; Reports</span>
+          </div>
+        </div>
+
+        <div class="stat-item">
+          <div class="stat-icon">📜</div>
+          <div class="stat-info">
+            <span class="stat-number" data-target="100" data-suffix="%">100%</span>
+            <span class="stat-label">Verified Certifications</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================================
+       OUR SERVICES SECTION (Light Surface with 4 Interactive Service Cards)
+       ================================================================= -->
+  <section id="services" class="services-section">
+    <div class="container">
+      <div class="section-header-flex">
+        <div>
+          <span class="section-label light-mode">— OUR SERVICES</span>
+          <h2 class="section-title">Training, Projects &amp; Research Solutions</h2>
+        </div>
+        <div style="max-width: 440px;">
+          <p class="section-desc">
+            Practical internships, custom technical implementations, and structured research reports designed for students and organizations.
+          </p>
+        </div>
+      </div>
+
+      <!-- 4 Interactive 3D Service Cards -->
+      <div class="services-grid">
+        <!-- 1. Technical Internship Programs -->
+        <div class="service-card-3d-wrap">
+          <div class="service-card-3d" data-service-type="tech-internship">
+            <div onclick="window.location.href='service-technical-internships.html'" style="cursor: pointer;">
+              <div class="service-card-top-row">
+                <div class="service-icon-box">&lt;/&gt;</div>
+                <span class="service-micro-tag">Engineering &amp; Dev</span>
+              </div>
+              <div class="service-card-body">
+                <h3 class="service-title">Technical Internship Programs</h3>
+                <p class="service-desc">Hands-on software, AI, and cloud engineering internships with mentor code reviews and live project delivery.</p>
+                <div class="service-highlights-list">
+                  <span class="service-highlight-pill">Full-Stack &amp; AI</span>
+                  <span class="service-highlight-pill">Mentor Reviews</span>
+                  <span class="service-highlight-pill">Certificate</span>
+                </div>
+              </div>
+            </div>
+            <div class="service-card-footer">
+              <a href="service-technical-internships.html" class="service-learn-more">Explore Details →</a>
+              <a href="https://wa.me/919976543210?text=Hi%20NEVO%20TECH%2C%20I%20am%20interested%20in%20the%20Technical%20Internship%20Programs.%20Please%20share%20program%20curriculum%2C%20batch%20dates%2C%20and%20enrollment%20details." target="_blank" rel="noopener noreferrer" class="service-whatsapp-btn" title="Enquire on WhatsApp for Technical Internship Programs" onclick="event.stopPropagation();">
+                <svg xmlns="http://www.w3.org/2000/svg" class="whatsapp-icon" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.016-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/></svg>
+                <span>WhatsApp Enquiry</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Business & Analytics Internship -->
+        <div class="service-card-3d-wrap">
+          <div class="service-card-3d" data-service-type="business-internship">
+            <div onclick="window.location.href='service-business-analytics-internship.html'" style="cursor: pointer;">
+              <div class="service-card-top-row">
+                <div class="service-icon-box">📊</div>
+                <span class="service-micro-tag">Strategy &amp; Data</span>
+              </div>
+              <div class="service-card-body">
+                <h3 class="service-title">Business &amp; Analytics Internship</h3>
+                <p class="service-desc">Applied training in BI dashboards, market research, KPI reporting, and structured business problem-solving.</p>
+                <div class="service-highlights-list">
+                  <span class="service-highlight-pill">BI Dashboards</span>
+                  <span class="service-highlight-pill">Market Audits</span>
+                  <span class="service-highlight-pill">Case Briefings</span>
+                </div>
+              </div>
+            </div>
+            <div class="service-card-footer">
+              <a href="service-business-analytics-internship.html" class="service-learn-more">Explore Details →</a>
+              <a href="https://wa.me/919976543210?text=Hi%20NEVO%20TECH%2C%20I%20am%20interested%20in%20the%20Business%20%26%20Analytics%20Internship.%20Please%20share%20syllabus%2C%20mentorship%20schedule%2C%20and%20enrollment%20details." target="_blank" rel="noopener noreferrer" class="service-whatsapp-btn" title="Enquire on WhatsApp for Business & Analytics Internship" onclick="event.stopPropagation();">
+                <svg xmlns="http://www.w3.org/2000/svg" class="whatsapp-icon" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.016-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/></svg>
+                <span>WhatsApp Enquiry</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Customized Technical Projects & Documentation -->
+        <div class="service-card-3d-wrap">
+          <div class="service-card-3d" data-service-type="custom-projects">
+            <div onclick="window.location.href='service-custom-projects-documentation.html'" style="cursor: pointer;">
+              <div class="service-card-top-row">
+                <div class="service-icon-box">🛠️</div>
+                <span class="service-micro-tag">Builds &amp; Docs</span>
+              </div>
+              <div class="service-card-body">
+                <h3 class="service-title">Customized Technical Projects &amp; Documentation</h3>
+                <p class="service-desc">Bespoke software, AI, and IoT project implementations delivered with clean source code, UML diagrams, and IEEE/SRS reports.</p>
+                <div class="service-highlights-list">
+                  <span class="service-highlight-pill">Source Code</span>
+                  <span class="service-highlight-pill">UML &amp; ER Diagrams</span>
+                  <span class="service-highlight-pill">SRS &amp; Synopsis</span>
+                </div>
+              </div>
+            </div>
+            <div class="service-card-footer">
+              <a href="service-custom-projects-documentation.html" class="service-learn-more">Explore Details →</a>
+              <a href="https://wa.me/919976543210?text=Hi%20NEVO%20TECH%2C%20I%20need%20assistance%20with%20Customized%20Technical%20Projects%20%26%20Documentation.%20Please%20share%20project%20consultation%20details." target="_blank" rel="noopener noreferrer" class="service-whatsapp-btn" title="Enquire on WhatsApp for Customized Technical Projects & Documentation" onclick="event.stopPropagation();">
+                <svg xmlns="http://www.w3.org/2000/svg" class="whatsapp-icon" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.016-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/></svg>
+                <span>WhatsApp Enquiry</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Survey-Based Projects & Research Reports -->
+        <div class="service-card-3d-wrap">
+          <div class="service-card-3d" data-service-type="survey-research">
+            <div onclick="window.location.href='service-survey-research-reports.html'" style="cursor: pointer;">
+              <div class="service-card-top-row">
+                <div class="service-icon-box">📋</div>
+                <span class="service-micro-tag">Research &amp; Insights</span>
+              </div>
+              <div class="service-card-body">
+                <h3 class="service-title">Survey-Based Projects &amp; Research Reports</h3>
+                <p class="service-desc">Questionnaire design, response tabulation, statistical chart analysis, and formatted academic or market research reports.</p>
+                <div class="service-highlights-list">
+                  <span class="service-highlight-pill">Survey Design</span>
+                  <span class="service-highlight-pill">Statistical Charts</span>
+                  <span class="service-highlight-pill">Final Report</span>
+                </div>
+              </div>
+            </div>
+            <div class="service-card-footer">
+              <a href="service-survey-research-reports.html" class="service-learn-more">Explore Details →</a>
+              <a href="https://wa.me/919976543210?text=Hi%20NEVO%20TECH%2C%20I%20am%20inquiring%20about%20Survey-Based%20Projects%20%26%20Research%20Reports.%20Please%20share%20methodology%2C%20analysis%2C%20and%20report%20details." target="_blank" rel="noopener noreferrer" class="service-whatsapp-btn" title="Enquire on WhatsApp for Survey-Based Projects & Research Reports" onclick="event.stopPropagation();">
+                <svg xmlns="http://www.w3.org/2000/svg" class="whatsapp-icon" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.016-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/></svg>
+                <span>WhatsApp Enquiry</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================================
+       ABOUT NEVO TECH SECTION (Navy Dark with Modern Office Visual)
+       ================================================================= -->
+  <section id="about" class="about-section">
+    <div class="container">
+      <div class="about-grid">
+        <!-- Left Visual: Modern Collaborative Hub -->
+        <div class="about-visual-container">
+          <img src="assets/office-render.svg" alt="NEVO TECH Collaborative Team in Modern Conference Room">
+          <div class="about-visual-overlay">
+            <div>
+              <strong style="color: #ffffff; font-size: 0.95rem;">NEVO Innovation Campus</strong>
+              <div style="font-size: 0.8rem; color: var(--color-highlight);">Engineering Hub · Bengaluru</div>
+            </div>
+            <span style="background: rgba(16, 185, 129, 0.2); color: #10b981; padding: 4px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 700;">LIVE OPS</span>
+          </div>
+        </div>
+
+        <!-- Right Content -->
+        <div class="about-content">
+          <span class="section-label">— ABOUT NEVO TECH</span>
+          <h2 class="about-title">Empowering Future Engineers, Analysts &amp; Researchers</h2>
+          <p class="about-desc">
+            NEVO TECH is a premier learning and innovation hub bridging the gap between academic theory and real-world execution. We deliver immersive technical internships, business &amp; data analytics training, customized technical project development, and rigorous survey research reports.
+          </p>
+
+          <!-- 3 Pillars Columns -->
+          <div class="about-pillars-grid">
+            <div class="pillar-card">
+              <div class="pillar-icon">🎯</div>
+              <h4 class="pillar-title">Our Mission</h4>
+              <p class="pillar-desc">Deliver career-defining internships and production-grade project development with complete IEEE documentation.</p>
+            </div>
+
+            <div class="pillar-card">
+              <div class="pillar-icon">📊</div>
+              <h4 class="pillar-title">Our Vision</h4>
+              <p class="pillar-desc">Empower students, researchers, and organizations with practical engineering mastery and data-driven insights.</p>
+            </div>
+
+            <div class="pillar-card">
+              <div class="pillar-icon">💎</div>
+              <h4 class="pillar-title">Our Values</h4>
+              <p class="pillar-desc">Hands-on Mastery, Academic Integrity, Technical Rigor, and Measurable Career Growth.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================================
+       FEATURED PROJECTS SECTION (Light Surface Case-Study Cards)
+       ================================================================= -->
+  <section id="projects" class="projects-section">
+    <div class="container">
+      <div class="section-header-flex">
+        <div>
+          <span class="section-label light-mode">— OUR DELIVERABLES &amp; CAPSTONES</span>
+          <h2 class="section-title">Featured Projects &amp; Research</h2>
+        </div>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="projects-filter-bar">
+        <button class="filter-btn active" data-filter="all">All Deliverables</button>
+        <button class="filter-btn" data-filter="tech-internship">Technical Internships</button>
+        <button class="filter-btn" data-filter="business-internship">Business &amp; Analytics</button>
+        <button class="filter-btn" data-filter="custom-projects">Custom Projects</button>
+        <button class="filter-btn" data-filter="survey-research">Survey &amp; Research</button>
+      </div>
+
+      <!-- Projects Grid (2x2 Balanced Grid matching 4 Service Tracks) -->
+      <div class="projects-grid">
+        <!-- Deliverable 1: Tech Internship Capstone -->
+        <div class="project-card" data-category="tech-internship" onclick="openProjectModal('tech_internship_capstone')">
+          <div class="project-card-body">
+            <div class="project-card-top">
+              <span class="project-tag">Technical Internship</span>
+              <span class="project-index">01</span>
+            </div>
+            <h3 class="project-title">Cloud-Native Microservices &amp; AI Pipeline</h3>
+            <p class="project-desc">Production-grade distributed API with Docker containerization, Kubernetes manifests, and automated CI/CD pipelines delivered by engineering interns.</p>
+            <div class="project-card-footer">
+              <span class="project-link-text">Explore Capstone Spec →</span>
+              <div class="project-action-btn">→</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Deliverable 2: Business Analytics Capstone -->
+        <div class="project-card" data-category="business-internship" onclick="openProjectModal('business_analytics_capstone')">
+          <div class="project-card-body">
+            <div class="project-card-top">
+              <span class="project-tag">Business &amp; Analytics</span>
+              <span class="project-index">02</span>
+            </div>
+            <h3 class="project-title">Omni-Channel Customer Intelligence &amp; Forecast Engine</h3>
+            <p class="project-desc">Interactive PowerBI and Python executive dashboards incorporating customer churn predictive modeling and SQL cohort analytics.</p>
+            <div class="project-card-footer">
+              <span class="project-link-text">Explore Capstone Spec →</span>
+              <div class="project-action-btn">→</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Deliverable 3: Custom Technical Project -->
+        <div class="project-card" data-category="custom-projects" onclick="openProjectModal('custom_technical_project')">
+          <div class="project-card-body">
+            <div class="project-card-top">
+              <span class="project-tag">Custom Technical Project</span>
+              <span class="project-index">03</span>
+            </div>
+            <h3 class="project-title">IoT Smart Edge Automation &amp; IEEE Dossier</h3>
+            <p class="project-desc">Full-stack edge computing integration with circuit schematics, embedded code, unit test suites, and an 80+ page IEEE-standard documentation dossier.</p>
+            <div class="project-card-footer">
+              <span class="project-link-text">Explore Project Dossier →</span>
+              <div class="project-action-btn">→</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Deliverable 4: Survey Research Report -->
+        <div class="project-card" data-category="survey-research" onclick="openProjectModal('survey_research_study')">
+          <div class="project-card-body">
+            <div class="project-card-top">
+              <span class="project-tag">Survey-Based Research</span>
+              <span class="project-index">04</span>
+            </div>
+            <h3 class="project-title">FinTech Adoption &amp; Consumer Sentiment Study</h3>
+            <p class="project-desc">Empirical quantitative paper based on 1,200+ survey responses with Cronbach's alpha verification, SPSS regression modeling, and academic manuscript.</p>
+            <div class="project-card-footer">
+              <span class="project-link-text">Explore Research Paper →</span>
+              <div class="project-action-btn">→</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================================
+       HOW WE WORK (OUR PROCESS) SECTION (Dark Track)
+       ================================================================= -->
+  <section id="process" class="process-section">
+    <div class="container">
+      <div class="section-header-flex">
+        <div>
+          <span class="section-label">— OUR METHODOLOGY</span>
+          <h2 class="section-title" style="color: #ffffff;">How We Deliver Excellence</h2>
+        </div>
+        <p class="section-desc" style="color: var(--color-accent);">
+          A rigorous 4-stage framework ensuring hands-on competency, peer-reviewed engineering, and verified documentation.
+        </p>
+      </div>
+
+      <!-- 4 Process Steps -->
+      <div class="process-grid">
+        <!-- Step 1 -->
+        <div class="process-card">
+          <div class="process-step-header">
+            <div class="process-icon">🎯</div>
+            <span class="process-number">01</span>
+          </div>
+          <h3 class="process-title">Track Alignment</h3>
+          <p class="process-desc">Select your internship track, customized project specs, or research scope with mentor guidance.</p>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="process-card">
+          <div class="process-step-header">
+            <div class="process-icon">📐</div>
+            <span class="process-number">02</span>
+          </div>
+          <h3 class="process-title">Architecture &amp; Design</h3>
+          <p class="process-desc">Establish software architecture, database schemas, survey questionnaires, and milestone roadmaps.</p>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="process-card">
+          <div class="process-step-header">
+            <div class="process-icon">&lt;/&gt;</div>
+            <span class="process-number">03</span>
+          </div>
+          <h3 class="process-title">Hands-On Sprints</h3>
+          <p class="process-desc">Develop code in live Git repositories, perform statistical data modeling, and undergo weekly reviews.</p>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="process-card">
+          <div class="process-step-header">
+            <div class="process-icon">📜</div>
+            <span class="process-number">04</span>
+          </div>
+          <h3 class="process-title">Defense &amp; Certification</h3>
+          <p class="process-desc">Receive tested source code, complete IEEE-format dossiers, research reports, and verified credentials.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================================
+       INDUSTRIES WE SERVE SECTION (Light Surface with 3D Hex/Tiles)
+       ================================================================= -->
+  <section id="industries" class="industries-section">
+    <div class="container">
+      <div class="section-header-flex">
+        <div>
+          <span class="section-label light-mode">— DOMAINS &amp; DISCIPLINES</span>
+          <h2 class="section-title">Specialized Project &amp; Research Domains</h2>
+        </div>
+      </div>
+
+      <!-- 6 Domain Cards -->
+      <div class="industries-grid">
+        <div class="industry-card">
+          <div class="industry-icon">💻</div>
+          <span class="industry-name">Computer Science &amp; Full-Stack</span>
+        </div>
+
+        <div class="industry-card">
+          <div class="industry-icon">🧠</div>
+          <span class="industry-name">AI, Machine Learning &amp; NLP</span>
+        </div>
+
+        <div class="industry-card">
+          <div class="industry-icon">📈</div>
+          <span class="industry-name">Business &amp; Financial Analytics</span>
+        </div>
+
+        <div class="industry-card">
+          <div class="industry-icon">⚡</div>
+          <span class="industry-name">Embedded Systems &amp; IoT</span>
+        </div>
+
+        <div class="industry-card">
+          <div class="industry-icon">☁️</div>
+          <span class="industry-name">Cloud Computing &amp; DevOps</span>
+        </div>
+
+        <div class="industry-card">
+          <div class="industry-icon">📋</div>
+          <span class="industry-name">Quantitative Survey &amp; Market Research</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================================
+       WHAT OUR CLIENTS SAY (TESTIMONIALS) SECTION
+       ================================================================= -->
+  <section id="testimonials" class="testimonials-section">
+    <div class="container">
+      <div style="text-align: center; margin-bottom: 3.5rem;">
+        <span class="section-label light-mode">— SUCCESS STORIES</span>
+        <h2 class="section-title">Trusted by Interns, Researchers<br>&amp; Academic Partners</h2>
+      </div>
+
+      <div class="testimonial-card-container">
+        <div class="testimonial-card">
+          <div class="testimonial-quote-icon">“</div>
+          <p id="testimonial-quote" class="testimonial-text">
+            “The Technical Internship Program at NEVO TECH gave me production Git repository experience, Docker containerization, and weekly mentor code reviews. It was the deciding factor in clearing my engineering interviews.”
+          </p>
+
+          <div class="testimonial-author-row">
+            <div class="author-profile">
+              <img id="testimonial-avatar" src="assets/client-rohan.svg" alt="Aditya Verma" class="author-avatar">
+              <div>
+                <h4 id="testimonial-author-name" class="author-name">Aditya Verma</h4>
+                <p id="testimonial-author-title" class="author-title">Full-Stack Engineering Intern (Placed at Tier-1 Firm)</p>
+              </div>
+            </div>
+
+            <div class="rating-stars">
+              ★★★★★
+            </div>
+          </div>
+        </div>
+
+        <!-- Carousel Navigation Controls -->
+        <div class="testimonial-controls">
+          <button id="testimonial-prev" class="carousel-nav-btn" aria-label="Previous Testimonial">←</button>
+          <div id="carousel-dots" class="carousel-dots">
+            <div class="dot active"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+          </div>
+          <button id="testimonial-next" class="carousel-nav-btn" aria-label="Next Testimonial">→</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================================
+       CALL TO ACTION (CTA) SECTION (3D WebGL Fluid Wave Ribbons)
+       ================================================================= -->
+  <section id="enquiry" class="cta-section">
+    <div class="container">
+      <div class="cta-banner-wrapper">
+        <div class="cta-content">
+          <h2 class="cta-title">Ready to Elevate Your Technical Future?</h2>
+          <p class="cta-desc">
+            Enroll in our next technical internship cohort or collaborate on customized technical projects and survey research reports.
+          </p>
+          <div class="cta-buttons">
+            <a href="#services" class="btn-pill-highlight">
+              Explore Our Services →
+            </a>
+            <a href="#contact" class="btn-pill-dark">
+              Contact Us
+            </a>
+          </div>
+        </div>
+
+        <!-- 3D Fluid Wave Ribbons Canvas Container -->
+        <div class="cta-3d-canvas-wrapper" id="cta-3d-wrapper"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================================
+       FOOTER (Deep Graphite & High-Tech Hierarchy)
+       ================================================================= -->
+  <footer id="contact" class="site-footer">
+    <div class="container">
+      <div class="footer-top-grid">
+        <!-- Col 1: Brand & Bio -->
+        <div class="footer-brand-col">
+          <a href="#home" class="footer-brand-logo-link" title="Back to Top">
+            <img src="assets/nevo-logo.png" alt="NEVO TECH Logo" class="footer-brand-lockup">
+          </a>
+          <p class="footer-tagline">
+            Building digital solutions for a smarter tomorrow.
+          </p>
+          <!-- Socials -->
+          <div class="social-links">
+            <a href="https://wa.me/919976543210?text=Hi%20NEVO%20TECH%2C%20I%20would%20like%20to%20enquire%20about%20your%20services%20and%20programs." target="_blank" rel="noopener noreferrer" class="social-icon-btn social-icon-whatsapp" aria-label="WhatsApp" title="Chat on WhatsApp">
+              <svg xmlns="http://www.w3.org/2000/svg" class="whatsapp-icon" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.016-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/></svg>
+            </a>
+            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="social-icon-btn social-icon-linkedin" aria-label="LinkedIn" title="LinkedIn">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452z"/></svg>
+            </a>
+            <a href="https://www.instagram.com/_nevotech_?srtk=MWQyM2Excml6bGhkOA==" target="_blank" rel="noopener noreferrer" class="social-icon-btn social-icon-instagram" aria-label="Instagram" title="Instagram">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+            </a>
+            <a href="mailto:nevotechsolutions@gmail.com" class="social-icon-btn social-icon-gmail" aria-label="Gmail" title="Gmail">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg>
+            </a>
+            <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" class="social-icon-btn social-icon-youtube" aria-label="YouTube" title="YouTube">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            </a>
+            <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="social-icon-btn social-icon-github" aria-label="GitHub" title="GitHub">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Col 2: Quick Links -->
+        <div>
+          <h4 class="footer-col-title">Quick Links</h4>
+          <ul class="footer-links-list">
+            <li><a href="#home" class="footer-link">Home</a></li>
+            <li><a href="#services" class="footer-link">Services</a></li>
+            <li><a href="#about" class="footer-link">About Us</a></li>
+            <li><a href="#projects" class="footer-link">Our Work</a></li>
+            <li><a href="#process" class="footer-link">Process</a></li>
+            <li><a href="#industries" class="footer-link">Industries</a></li>
+            <li><a href="#testimonials" class="footer-link">Reviews</a></li>
+            <li><a href="#contact" class="footer-link">Contact</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 3: Our Services -->
+        <div>
+          <h4 class="footer-col-title">Our Services</h4>
+          <ul class="footer-links-list">
+            <li><a href="service-technical-internships.html" class="footer-link">Technical Internship Programs</a></li>
+            <li><a href="service-business-analytics-internship.html" class="footer-link">Business &amp; Analytics Internship</a></li>
+            <li><a href="service-custom-projects-documentation.html" class="footer-link">Customized Technical Projects &amp; Documentation</a></li>
+            <li><a href="service-survey-research-reports.html" class="footer-link">Survey-Based Projects &amp; Research Reports</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 4: Contact Info -->
+        <div>
+          <h4 class="footer-col-title">Contact Us</h4>
+          <ul class="footer-contact-list">
+            <li class="contact-item">
+              <span class="contact-icon contact-icon-location" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              </span>
+              <span>Bengaluru, India</span>
+            </li>
+            <li class="contact-item">
+              <span class="contact-icon contact-icon-whatsapp" aria-hidden="true" title="WhatsApp Contact">
+                <svg xmlns="http://www.w3.org/2000/svg" class="whatsapp-icon" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.016-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/></svg>
+              </span>
+              <a href="https://wa.me/919976543210?text=Hi%20NEVO%20TECH%2C%20I%20would%20like%20to%20enquire%20about%20your%20services%20and%20programs." class="footer-link" target="_blank" rel="noopener noreferrer">+91 99765 43210</a>
+            </li>
+            <li class="contact-item">
+              <span class="contact-icon contact-icon-email" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+              </span>
+              <a href="mailto:nevotechsolutions@gmail.com" class="footer-link">nevotechsolutions@gmail.com</a>
+            </li>
+            <li class="contact-item">
+              <span class="contact-icon contact-icon-hours" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </span>
+              <span>Mon – Sat, 9 AM – 6 PM</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Bottom Bar -->
+      <div class="footer-bottom-bar">
+        <div>© 2026 NEVO TECH. All Rights Reserved.</div>
+        <div class="footer-legal-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+          <a href="#">Sitemap</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+
+  <!-- =================================================================
+       MODAL 2: "WATCH OUR STORY" VIDEO REEL MODAL
+       ================================================================= -->
+  <div id="story-modal" class="modal-overlay">
+    <div class="modal-dialog" style="max-width: 780px;">
+      <button id="close-story-modal" class="modal-close-btn" aria-label="Close Video Reel">✕</button>
+      <div class="modal-header">
+        <h3 class="modal-title">NEVO TECH — The Innovation Story</h3>
+        <p class="modal-subtitle">How we mentor future-ready engineers, build customized systems, and conduct empirical research.</p>
+      </div>
+
+      <!-- Technical 3D Neural Architecture Viewer -->
+      <div class="tech-story-viewport" style="background: #090e18; border: 1px solid rgba(137,227,245,0.3); border-radius: 14px; padding: 1.5rem; position: relative; overflow: hidden; min-height: 320px; display: flex; flex-direction: column;">
+        <!-- Top Telemetry Stream -->
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:0.75rem; margin-bottom:1rem; font-family:monospace; font-size:0.75rem;">
+          <span style="color:#10b981; display:flex; align-items:center; gap:6px;">
+            <span style="width:7px; height:7px; border-radius:50%; background:#10b981; box-shadow:0 0 8px #10b981;"></span>
+            LIVE SYSTEM TELEMETRY
+          </span>
+          <span style="color:#89e3f5;">INFERENCE: 12ms · 128 TENSOR NODES</span>
+          <span style="color:#f59e0b;">SLA: 99.99%</span>
+        </div>
+
+        <!-- 3D Technical Simulation Canvas Container -->
+        <div id="tech-story-3d-canvas" style="width: 100%; height: 210px; position: relative; border-radius: 8px; overflow: hidden; background: radial-gradient(circle at 50% 50%, #101c30 0%, #060a12 80%);">
+          <canvas id="story-neural-canvas" style="width:100%; height:100%; display:block;"></canvas>
+          <div style="position: absolute; bottom: 10px; left: 12px; font-size: 0.72rem; color: #38bdf8; font-family: monospace;">
+            [ NEVO QUANTUM MATRIX v4.2 ] — Active Optical Bus
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1.2rem; flex-wrap:wrap; gap:10px;">
+          <div>
+            <h4 style="font-size: 1.1rem; color: #ffffff;">Hands-On Engineering &amp; Research Excellence</h4>
+            <p style="color: #94a3b8; font-size: 0.82rem; margin-top:2px;">
+              Accelerating career growth through industry mentorship, custom project builds, and publication-ready research reports.
+            </p>
+          </div>
+          <button class="btn-pill-primary" style="padding: 0.5rem 1.2rem; font-size: 0.85rem;" onclick="document.getElementById('story-modal').classList.remove('active')">
+            Close Story
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =================================================================
+       MODAL 3: PROJECT PREVIEW MODAL
+       ================================================================= -->
+  <div id="project-modal" class="modal-overlay">
+    <div class="modal-dialog">
+      <button id="close-project-modal" class="modal-close-btn">✕</button>
+      <div class="modal-header">
+        <span id="project-modal-tag" class="project-tag">Web Application</span>
+        <h3 id="project-modal-title" class="modal-title" style="margin-top: 0.5rem;">Project Title</h3>
+        <p id="project-modal-desc" class="modal-subtitle" style="margin-top: 0.8rem; line-height: 1.6;"></p>
+      </div>
+
+      <div class="calc-group">
+        <label class="calc-label">Key Highlights &amp; Architecture:</label>
+        <div id="project-modal-stats" class="modal-tags-chips"></div>
+      </div>
+
+      <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+        <a href="#services" class="btn-pill-primary" style="flex: 1; text-align: center; justify-content: center; padding: 0.75rem 1.2rem; font-size: 0.9rem;" onclick="document.getElementById('project-modal').classList.remove('active')">
+          Explore Related Services →
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Element -->
+  <div id="toast-notification" class="toast-notification">
+    <span style="color: var(--color-highlight); font-size: 1.2rem;">✦</span>
+    <span id="toast-message">Notification message here</span>
+  </div>
+
+  <!-- Application Logic & 3D WebGL Engines -->
+  <script src="ctaScene3d.js"></script>
+  <script src="app.js?v=2.4"></script>
+</body>
+</html>

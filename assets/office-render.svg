@@ -1,0 +1,84 @@
+<svg width="640" height="520" viewBox="0 0 640 520" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="wallGrad" x1="0" y1="0" x2="640" y2="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#181e29"/>
+      <stop offset="100%" stop-color="#0a0d13"/>
+    </linearGradient>
+    <linearGradient id="logoGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="50%" stop-color="#89E3F5"/>
+      <stop offset="100%" stop-color="#38BDF8"/>
+    </linearGradient>
+    <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background Office Architecture -->
+  <rect width="640" height="520" rx="16" fill="url(#wallGrad)"/>
+  
+  <!-- Ceiling Light Tracks with Neon Ice Blue Glow -->
+  <line x1="80" y1="40" x2="560" y2="40" stroke="#3A506B" stroke-width="3"/>
+  <line x1="120" y1="40" x2="200" y2="40" stroke="#89E3F5" stroke-width="4" filter="url(#neonGlow)"/>
+  <line x1="380" y1="40" x2="480" y2="40" stroke="#89E3F5" stroke-width="4" filter="url(#neonGlow)"/>
+
+  <!-- Ambient Wall Lighting -->
+  <ellipse cx="320" cy="180" rx="260" ry="140" fill="#89E3F5" fill-opacity="0.08"/>
+
+  <!-- Feature Dark Wall with Illuminated "N" NEVO TECH Logo -->
+  <rect x="180" y="90" width="280" height="150" rx="12" fill="#141923" stroke="#252D3D" stroke-width="2"/>
+  
+  <!-- Origami 3D Illuminated "N" Logo -->
+  <g transform="translate(295, 120)">
+    <!-- Left vertical bar -->
+    <path d="M0 0 L14 -8 L14 48 L0 56 Z" fill="url(#logoGrad)" filter="url(#neonGlow)"/>
+    <!-- Diagonal cross ribbon -->
+    <path d="M14 -8 L40 38 L26 46 L0 0 Z" fill="#89E3F5" opacity="0.95"/>
+    <!-- Right vertical bar -->
+    <path d="M26 0 L40 -8 L40 48 L26 56 Z" fill="url(#logoGrad)" filter="url(#neonGlow)"/>
+  </g>
+  <text x="320" y="205" font-family="'Plus Jakarta Sans', sans-serif" font-size="14" font-weight="800" fill="#FFFFFF" text-anchor="middle" letter-spacing="3">NEVO TECH</text>
+  <text x="320" y="222" font-family="'Inter', sans-serif" font-size="8" font-weight="600" fill="#89E3F5" text-anchor="middle" letter-spacing="4">INNOVATION HUB</text>
+
+  <!-- Big Glass Conference Table in foreground -->
+  <path d="M60 410 L580 410 L510 510 L130 510 Z" fill="#1E2837" stroke="#3A506B" stroke-width="1.5"/>
+  <path d="M70 415 L570 415 L505 500 L135 500 Z" fill="#141E2C" opacity="0.7"/>
+
+  <!-- Laptops on table with glowing screens -->
+  <!-- Laptop 1 -->
+  <rect x="180" y="420" width="70" height="42" rx="4" fill="#0B132B" stroke="#38BDF8" stroke-width="1.5" filter="url(#neonGlow)"/>
+  <text x="215" y="444" font-family="'Inter', monospace" font-size="8" fill="#89E3F5" text-anchor="middle">&lt;code /&gt;</text>
+  <!-- Laptop 2 -->
+  <rect x="390" y="420" width="70" height="42" rx="4" fill="#0B132B" stroke="#89E3F5" stroke-width="1.5" filter="url(#neonGlow)"/>
+  <text x="425" y="444" font-family="'Inter', monospace" font-size="8" fill="#89E3F5" text-anchor="middle">AI Pipeline</text>
+
+  <!-- Silhouettes of Engineers & Consultants Collaborating -->
+  <!-- Person 1 (Left) -->
+  <circle cx="160" cy="310" r="22" fill="#222B3A"/>
+  <path d="M120 400 C120 350, 150 335, 175 338 C195 340, 205 370, 200 400 Z" fill="#1D2433"/>
+
+  <!-- Person 2 (Center left) -->
+  <circle cx="270" cy="320" r="20" fill="#2A3547"/>
+  <path d="M235 400 C235 355, 260 345, 280 348 C300 350, 310 380, 305 400 Z" fill="#222C3D"/>
+
+  <!-- Person 3 (Right) -->
+  <circle cx="475" cy="305" r="23" fill="#2A3547"/>
+  <path d="M435 400 C435 350, 465 335, 490 338 C515 340, 525 375, 520 400 Z" fill="#1D2433"/>
+
+  <!-- Indoor plant on right -->
+  <path d="M570 340 Q 560 380, 580 430 Q 600 370, 570 340 Z" fill="#1E392B"/>
+  <path d="M590 320 Q 580 360, 600 420 Q 620 360, 590 320 Z" fill="#284D3A"/>
+  <rect x="575" y="430" width="30" height="35" rx="4" fill="#332219"/>
+
+  <!-- Live interactive overlay badge -->
+  <g transform="translate(30, 30)">
+    <rect width="180" height="36" rx="18" fill="#111827" fill-opacity="0.8" stroke="#38BDF8" stroke-width="1"/>
+    <circle cx="20" cy="18" r="6" fill="#10B981"/>
+    <circle cx="20" cy="18" r="10" stroke="#10B981" stroke-width="1.5" opacity="0.6"/>
+    <text x="36" y="22" font-family="'Inter', sans-serif" font-size="10" font-weight="600" fill="#F3F4F6">NEVO Headquarters · Active</text>
+  </g>
+</svg>

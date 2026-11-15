@@ -1,0 +1,731 @@
+/**
+ * NEVO TECH - Main Interactive Application Script
+ * 3D Tilt Physics, Sound Synth, Modal Estimator, Testimonial Slider, & UI Dynamics
+ */
+
+document.addEventListener('DOMContentLoaded', () => {
+
+  // =================================================================
+  // 0. STYLISH SMOOTH PRELOADER
+  // Handled immediately by inline preloader script in index.html
+  // =================================================================
+
+  // =================================================================
+  // 1. WEB AUDIO API SYNTHESIZER (CYBER SFX)
+  // =================================================================
+  let audioCtx = null;
+  let isSoundMuted = true; // Default muted for smooth user experience
+
+  function initAudio() {
+    if (!audioCtx) {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (AudioContext) {
+        audioCtx = new AudioContext();
+      }
+    }
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+  }
+
+  window.playSfx = function(type) {
+    // Audio FX disabled
+  };
+
+  // Audio FX removed upon request
+
+  // =================================================================
+  // 3. 3D CARD TILT WITH SPECULAR GLARE
+  // =================================================================
+  const tiltCards = document.querySelectorAll('.service-card-3d, .project-card, .about-visual-container');
+
+  tiltCards.forEach(card => {
+    if (!card.querySelector('.card-glare') && card.classList.contains('service-card-3d')) {
+      const glare = document.createElement('div');
+      glare.className = 'card-glare';
+      card.appendChild(glare);
+    }
+
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+
+      // Calculate tilt angles (limit to max 10 deg)
+      const rotateX = ((y - centerY) / centerY) * -10;
+      const rotateY = ((x - centerX) / centerX) * 10;
+
+      card.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale3d(1.02, 1.02, 1.02)`;
+
+      const glare = card.querySelector('.card-glare');
+      if (glare) {
+        glare.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(255, 255, 255, 0.42) 0%, transparent 60%)`;
+      }
+    });
+
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+      card.style.transition = 'transform 0.5s ease-out';
+      const glare = card.querySelector('.card-glare');
+      if (glare) {
+        glare.style.background = 'none';
+      }
+    });
+
+    card.addEventListener('mouseenter', () => {
+      card.style.transition = 'none';
+    });
+  });
+
+  // =================================================================
+  // 4. ANIMATED STATS COUNTER
+  // =================================================================
+  const statsElements = document.querySelectorAll('.stat-number');
+  let statsTriggered = false;
+
+  function runStatsCounter() {
+    statsElements.forEach(el => {
+      const target = parseInt(el.getAttribute('data-target') || '0', 10);
+      const suffix = el.getAttribute('data-suffix') || '';
+      let current = 0;
+      const increment = Math.ceil(target / 45);
+      const timer = setInterval(() => {
+        current += increment;
+        if (current >= target) {
+          current = target;
+          clearInterval(timer);
+        }
+        el.textContent = `${current}${suffix}`;
+      }, 35);
+    });
+  }
+
+  const statsSection = document.querySelector('.hero-stats-bar');
+  if (statsSection) {
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && !statsTriggered) {
+        statsTriggered = true;
+        runStatsCounter();
+      }
+    }, { threshold: 0.3 });
+    observer.observe(statsSection);
+  }
+
+  // =================================================================
+  // 5. MOBILE MENU
+  // =================================================================
+  const mobileToggle = document.querySelector('.mobile-toggle');
+  const navMenu = document.querySelector('.nav-menu');
+  if (mobileToggle && navMenu) {
+    mobileToggle.addEventListener('click', () => {
+      navMenu.classList.toggle('open');
+      if (window.playSfx) playSfx('click');
+    });
+
+    navMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        navMenu.classList.remove('open');
+      });
+    });
+  }
+
+  // =================================================================
+  // 6. PROJECT FILTER TABS
+  // =================================================================
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const projectCards = document.querySelectorAll('.project-card');
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const category = btn.getAttribute('data-filter');
+
+      playSfx('click');
+
+      projectCards.forEach(card => {
+        const cardCat = card.getAttribute('data-category');
+        if (category === 'all' || cardCat === category) {
+          card.style.display = 'flex';
+          card.style.animation = 'slideUpFade 0.35s ease';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+  });
+
+  // =================================================================
+  // 7. TESTIMONIAL CAROUSEL
+  // =================================================================
+  const testimonials = [
+    {
+      quote: "“The Technical Internship Program at NEVO TECH gave me production Git repository experience, Docker containerization, and weekly mentor code reviews. It was the deciding factor in clearing my engineering interviews.”",
+      name: "Aditya Verma",
+      title: "Full-Stack Engineering Intern (Placed at Tier-1 Firm)",
+      avatar: "assets/client-rohan.svg",
+      stars: "★★★★★"
+    },
+    {
+      quote: "“Hands-on exposure to real-world customer transactional datasets, SQL window functions, and interactive PowerBI executive dashboards. The internship bridged academic theory and corporate analytics expectations perfectly.”",
+      name: "Sneha Kulkarni",
+      title: "Business & Analytics Intern (Data Analyst)",
+      avatar: "assets/client-rohan.svg",
+      stars: "★★★★★"
+    },
+    {
+      quote: "“NEVO TECH's customized project development and survey-based research reports adhere to impeccable academic and industrial standards. From statistical methodology to IEEE-format documentation, their execution is unmatched.”",
+      name: "Dr. Rajesh Sharma",
+      title: "Head of Research & Dean, Academic Partner Institution",
+      avatar: "assets/client-rohan.svg",
+      stars: "★★★★★"
+    }
+  ];
+
+  let currentTestimonialIndex = 0;
+  const quoteEl = document.getElementById('testimonial-quote');
+  const authorNameEl = document.getElementById('testimonial-author-name');
+  const authorTitleEl = document.getElementById('testimonial-author-title');
+  const authorAvatarEl = document.getElementById('testimonial-avatar');
+  const dotsContainer = document.getElementById('carousel-dots');
+
+  function renderTestimonial(index) {
+    if (!quoteEl) return;
+    const item = testimonials[index];
+
+    quoteEl.style.opacity = '0';
+    quoteEl.style.transform = 'translateY(10px)';
+
+    setTimeout(() => {
+      quoteEl.textContent = item.quote;
+      authorNameEl.textContent = item.name;
+      authorTitleEl.textContent = item.title;
+      if (authorAvatarEl) authorAvatarEl.src = item.avatar;
+
+      quoteEl.style.transition = 'all 0.3s ease';
+      quoteEl.style.opacity = '1';
+      quoteEl.style.transform = 'translateY(0)';
+
+      // Update dots
+      if (dotsContainer) {
+        Array.from(dotsContainer.children).forEach((dot, idx) => {
+          dot.classList.toggle('active', idx === index);
+        });
+      }
+    }, 200);
+  }
+
+  // Dots setup
+  if (dotsContainer) {
+    dotsContainer.innerHTML = '';
+    testimonials.forEach((_, idx) => {
+      const dot = document.createElement('div');
+      dot.className = `dot ${idx === 0 ? 'active' : ''}`;
+      dot.addEventListener('click', () => {
+        currentTestimonialIndex = idx;
+        renderTestimonial(idx);
+        playSfx('click');
+      });
+      dotsContainer.appendChild(dot);
+    });
+  }
+
+  const prevBtn = document.getElementById('testimonial-prev');
+  const nextBtn = document.getElementById('testimonial-next');
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      currentTestimonialIndex = (currentTestimonialIndex - 1 + testimonials.length) % testimonials.length;
+      renderTestimonial(currentTestimonialIndex);
+      playSfx('click');
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      currentTestimonialIndex = (currentTestimonialIndex + 1) % testimonials.length;
+      renderTestimonial(currentTestimonialIndex);
+      playSfx('click');
+    });
+  }
+
+  // =================================================================
+  // 8. INTERACTIVE "GET A QUOTE" ESTIMATOR MODAL
+  // =================================================================
+  const quoteModal = document.getElementById('quote-modal');
+  const openQuoteBtns = document.querySelectorAll('.open-quote-modal');
+  const closeQuoteBtn = document.getElementById('close-quote-modal');
+
+  openQuoteBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (navMenu) navMenu.classList.remove('open');
+      if (quoteModal) {
+        quoteModal.classList.add('active');
+        playSfx('modal');
+      }
+    });
+  });
+
+  if (closeQuoteBtn && quoteModal) {
+    closeQuoteBtn.addEventListener('click', () => {
+      quoteModal.classList.remove('active');
+      playSfx('click');
+    });
+    quoteModal.addEventListener('click', (e) => {
+      if (e.target === quoteModal) {
+        quoteModal.classList.remove('active');
+      }
+    });
+  }
+
+  // Quote Calculator Logic
+  const serviceChips = document.querySelectorAll('.calc-chip[data-service]');
+  const budgetSlider = document.getElementById('budget-slider');
+  const budgetValDisplay = document.getElementById('budget-value-display');
+  const estimateTotalDisplay = document.getElementById('estimate-total-display');
+
+  const basePrices = {
+    'tech-internship': 800,
+    'business-internship': 700,
+    'custom-projects': 2200,
+    'survey-research': 1400
+  };
+
+  let selectedServices = Array.from(serviceChips)
+    .filter(chip => chip.classList.contains('selected'))
+    .map(chip => chip.getAttribute('data-service'));
+
+  function updateEstimate() {
+    const budget = budgetSlider ? parseInt(budgetSlider.value, 10) : 3000;
+    const chipTotal = selectedServices.reduce((sum, s) => sum + (basePrices[s] || 1000), 0);
+    const highEstimate = Math.max(budget, chipTotal);
+    const lowEstimate = Math.max(500, Math.round(highEstimate * 0.85));
+    if (estimateTotalDisplay) {
+      estimateTotalDisplay.textContent = `$${lowEstimate.toLocaleString()} – $${highEstimate.toLocaleString()}`;
+    }
+  }
+
+  serviceChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      chip.classList.toggle('selected');
+      const service = chip.getAttribute('data-service');
+      if (selectedServices.includes(service)) {
+        selectedServices = selectedServices.filter(s => s !== service);
+      } else {
+        selectedServices.push(service);
+      }
+      playSfx('click');
+      updateEstimate();
+    });
+  });
+
+  if (budgetSlider && budgetValDisplay) {
+    budgetSlider.addEventListener('input', (e) => {
+      const val = parseInt(e.target.value, 10);
+      budgetValDisplay.textContent = `$${val.toLocaleString()}`;
+      updateEstimate();
+    });
+  }
+
+  updateEstimate();
+
+  // Quote Form Submission with Confetti
+  const quoteForm = document.getElementById('quote-form');
+  if (quoteForm) {
+    quoteForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      playSfx('success');
+
+      // Trigger Confetti Celebration if canvas-confetti is loaded
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+      }
+
+      showToast("Quote Request Sent! Our team will contact you within 2 hours.");
+      setTimeout(() => {
+        if (quoteModal) quoteModal.classList.remove('active');
+        quoteForm.reset();
+        if (budgetSlider && budgetValDisplay) {
+          const resetVal = parseInt(budgetSlider.value, 10);
+          budgetValDisplay.textContent = `$${resetVal.toLocaleString()}`;
+        }
+        selectedServices = Array.from(serviceChips)
+          .filter(chip => chip.classList.contains('selected'))
+          .map(chip => chip.getAttribute('data-service'));
+        updateEstimate();
+      }, 1500);
+    });
+  }
+
+  // =================================================================
+  // 9. "WATCH OUR STORY" VIDEO REEL MODAL & TECHNICAL 3D SIMULATION
+  // =================================================================
+  const storyModal = document.getElementById('story-modal');
+  const openStoryBtn = document.getElementById('open-story-modal');
+  const closeStoryBtn = document.getElementById('close-story-modal');
+
+  let storySceneInitialized = false;
+  function initStoryTechnicalCanvas() {
+    if (storySceneInitialized) return;
+    const canvas = document.getElementById('story-neural-canvas');
+    if (!canvas || typeof THREE === 'undefined') return;
+
+    storySceneInitialized = true;
+    const container = document.getElementById('tech-story-3d-canvas');
+    const w = (container ? container.clientWidth : 650) || 650;
+    const h = 210;
+
+    const sScene = new THREE.Scene();
+    const sCam = new THREE.PerspectiveCamera(45, w / h, 0.1, 100);
+    sCam.position.set(0, 4, 18);
+    sCam.lookAt(0, 0, 0);
+
+    const sRen = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+    sRen.setSize(w, h);
+    sRen.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    // Rotating Technical Lattice
+    const sphereGeo = new THREE.IcosahedronGeometry(4.2, 2);
+    const sphereMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, wireframe: true, transparent: true, opacity: 0.65 });
+    const sphereMesh = new THREE.Mesh(sphereGeo, sphereMat);
+    sScene.add(sphereMesh);
+
+    // Inner glowing core
+    const innerGeo = new THREE.OctahedronGeometry(2.0, 1);
+    const innerMat = new THREE.MeshBasicMaterial({ color: 0x89e3f5, wireframe: false });
+    const innerMesh = new THREE.Mesh(innerGeo, innerMat);
+    sScene.add(innerMesh);
+
+    // Orbital Ring
+    const oRingGeo = new THREE.TorusGeometry(6.2, 0.12, 8, 48);
+    const oRingMat = new THREE.MeshBasicMaterial({ color: 0x10b981, transparent: true, opacity: 0.8 });
+    const oRing = new THREE.Mesh(oRingGeo, oRingMat);
+    oRing.rotation.x = Math.PI / 3;
+    sScene.add(oRing);
+
+    function loopStory() {
+      if (storyModal && storyModal.classList.contains('active')) {
+        sphereMesh.rotation.y += 0.014;
+        sphereMesh.rotation.x += 0.007;
+        innerMesh.rotation.y -= 0.018;
+        oRing.rotation.z += 0.015;
+        sRen.render(sScene, sCam);
+      }
+      requestAnimationFrame(loopStory);
+    }
+    loopStory();
+  }
+
+  if (openStoryBtn && storyModal) {
+    openStoryBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      storyModal.classList.add('active');
+      playSfx('modal');
+      setTimeout(initStoryTechnicalCanvas, 50);
+    });
+  }
+
+  if (closeStoryBtn && storyModal) {
+    closeStoryBtn.addEventListener('click', () => {
+      storyModal.classList.remove('active');
+      playSfx('click');
+    });
+    storyModal.addEventListener('click', (e) => {
+      if (e.target === storyModal) {
+        storyModal.classList.remove('active');
+      }
+    });
+  }
+
+  // =================================================================
+  // 10. PROJECT PREVIEW MODAL
+  // =================================================================
+  const projectModal = document.getElementById('project-modal');
+  const closeProjectModal = document.getElementById('close-project-modal');
+  const projectDetails = {
+    tech_internship_capstone: {
+      title: "Cloud-Native Microservices & AI Pipeline (Internship Capstone)",
+      tag: "Technical Internship / Full-Stack & Cloud",
+      desc: "Engineered during our 8-week Technical Internship Program. Built with modern microservices, Docker, Kubernetes manifests, and automated GitHub Actions CI/CD. Interns solved real sprint tickets, reviewed pull requests, and delivered containerized API services with sub-40ms latency.",
+      stats: ["Production CI/CD", "Docker & Kubernetes", "Live Mentorship", "Verified Certificate"]
+    },
+    business_analytics_capstone: {
+      title: "Omni-Channel Customer Intelligence & Forecast Engine",
+      tag: "Business & Analytics Internship / BI",
+      desc: "Developed in our Business & Analytics Internship track. Leverages real-world transactional datasets, advanced SQL aggregations, Python predictive modeling, and interactive PowerBI/Tableau executive dashboards for predictive churn and revenue forecasting.",
+      stats: ["Predictive ML Models", "SQL & Python BI", "PowerBI Dashboards", "Executive Presentation"]
+    },
+    custom_technical_project: {
+      title: "IoT Smart Edge Automation & Full Technical Documentation",
+      tag: "Customized Technical Project / IEEE Standard",
+      desc: "Turnkey customized engineering solution delivering clean source code, hardware/software integration, circuit blueprints, unit test suites, and a comprehensive 80+ page IEEE-format project documentation dossier ready for academic or enterprise submission.",
+      stats: ["Full Source Code", "IEEE Dossier Included", "Zero Plagiarism", "100% Viva Ready"]
+    },
+    survey_research_study: {
+      title: "FinTech Adoption & Consumer Sentiment Empirical Study",
+      tag: "Survey-Based Project & Research Report",
+      desc: "Empirical market research report based on 1,200+ respondent survey data. Includes validated questionnaire design, Cronbach's alpha reliability checks, ANOVA and multivariate regression in SPSS/R, and a publication-ready academic manuscript.",
+      stats: ["1,200+ Validated Responses", "SPSS / R Analysis", "Publication-Ready", "Comprehensive Methodology"]
+    },
+    // Backwards-compatible aliases
+    devsync: {
+      title: "Cloud-Native Microservices & AI Pipeline (Internship Capstone)",
+      tag: "Technical Internship / Full-Stack & Cloud",
+      desc: "Engineered during our 8-week Technical Internship Program with Docker, Kubernetes, and automated CI/CD pipelines.",
+      stats: ["Production CI/CD", "Docker & Kubernetes", "Live Mentorship", "Verified Certificate"]
+    },
+    heavymachinery: {
+      title: "Omni-Channel Customer Intelligence & Forecast Engine",
+      tag: "Business & Analytics Internship / BI",
+      desc: "Developed in our Business & Analytics Internship track with Python predictive modeling and interactive PowerBI dashboards.",
+      stats: ["Predictive ML Models", "SQL & Python BI", "PowerBI Dashboards", "Executive Presentation"]
+    },
+    collegeportal: {
+      title: "IoT Smart Edge Automation & Full Technical Documentation",
+      tag: "Customized Technical Project / IEEE Standard",
+      desc: "Turnkey customized engineering solution delivering clean source code and comprehensive 80+ page IEEE-format project documentation.",
+      stats: ["Full Source Code", "IEEE Dossier Included", "Zero Plagiarism", "100% Viva Ready"]
+    }
+  };
+
+  window.openProjectModal = function(projectId) {
+    const data = projectDetails[projectId];
+    if (!data || !projectModal) return;
+
+    document.getElementById('project-modal-title').textContent = data.title;
+    document.getElementById('project-modal-tag').textContent = data.tag;
+    document.getElementById('project-modal-desc').textContent = data.desc;
+
+    const statsContainer = document.getElementById('project-modal-stats');
+    if (statsContainer) {
+      statsContainer.innerHTML = data.stats.map(s => `<span class="calc-chip selected">${s}</span>`).join('');
+    }
+
+    projectModal.classList.add('active');
+    playSfx('modal');
+  };
+
+  if (closeProjectModal && projectModal) {
+    closeProjectModal.addEventListener('click', () => {
+      projectModal.classList.remove('active');
+      playSfx('click');
+    });
+    projectModal.addEventListener('click', (e) => {
+      if (e.target === projectModal) {
+        projectModal.classList.remove('active');
+      }
+    });
+  }
+
+  // =================================================================
+  // 11. TOAST NOTIFICATION HELPER
+  // =================================================================
+  function showToast(message) {
+    const toast = document.getElementById('toast-notification');
+    const toastMsg = document.getElementById('toast-message');
+    if (toast && toastMsg) {
+      toastMsg.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3500);
+    }
+  }
+
+  window.showToast = showToast;
+
+  // =================================================================
+  // 13. PROFESSIONAL ADVANCED INERTIAL SCROLL ENGINE (APPLE / LINEAR / STRIPE)
+  // =================================================================
+  let lenis = null;
+  let isSmoothScrollActive = true;
+
+  const scrollProgressBar = document.getElementById('scroll-progress-line');
+  const scrollProgressCircle = document.getElementById('scroll-progress-circle');
+  const backToTopBtn = document.getElementById('back-to-top-btn') || document.querySelector('.back-to-top');
+  const navbar = document.querySelector('.navbar');
+  const navLinks = document.querySelectorAll('.nav-menu a[href^="#"]');
+  const trackedSections = document.querySelectorAll('section[id], header[id]');
+
+  const CIRCUMFERENCE = 125.66; // 2 * PI * 20 (SVG r=20)
+
+  // Top-tier inertial parameters (buttery smooth, immediate response, natural glide)
+  const SCROLL_CONFIG = {
+    duration: 1.15,
+    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    orientation: 'vertical',
+    gestureOrientation: 'vertical',
+    smoothWheel: true,
+    wheelMultiplier: 1.02,
+    touchMultiplier: 1.0,
+    syncTouch: false, // Ensures native 120Hz smooth touch momentum on mobile
+    infinite: false,
+    autoResize: true
+  };
+
+  // Nav Scrollspy: Dynamically highlight the active section in the navbar
+  function updateScrollspy(currentY) {
+    if (!trackedSections.length || !navLinks.length) return;
+    const scrollPos = currentY + window.innerHeight * 0.35;
+
+    let currentSectionId = '';
+    trackedSections.forEach(sec => {
+      const top = sec.offsetTop;
+      const height = sec.offsetHeight;
+      if (scrollPos >= top && scrollPos < top + height) {
+        currentSectionId = sec.id;
+      }
+    });
+
+    if (currentSectionId) {
+      navLinks.forEach(link => {
+        const href = link.getAttribute('href');
+        if (href === `#${currentSectionId}`) {
+          link.classList.add('active');
+        } else if (href && href.startsWith('#')) {
+          link.classList.remove('active');
+        }
+      });
+    }
+  }
+
+  // Visual indicators update (Top progress line, circular back-to-top ring, navbar elevation)
+  function handleScrollUpdate(scroll, progress) {
+    // 1. Glowing top progress bar
+    if (scrollProgressBar) {
+      scrollProgressBar.style.width = `${Math.min(100, Math.max(0, progress * 100)).toFixed(1)}%`;
+    }
+
+    // 2. Circular Back-to-Top Progress Ring
+    if (scrollProgressCircle) {
+      const offset = CIRCUMFERENCE - (progress * CIRCUMFERENCE);
+      scrollProgressCircle.style.strokeDashoffset = `${Math.max(0, offset).toFixed(2)}`;
+    }
+
+    // 3. Back-to-top button visibility
+    if (backToTopBtn) {
+      if (scroll > 280) {
+        backToTopBtn.classList.add('visible');
+      } else {
+        backToTopBtn.classList.remove('visible');
+      }
+    }
+
+    // 4. Navbar scroll elevation & backdrop blur
+    if (navbar) {
+      if (scroll > 35) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    }
+
+    // 5. Intelligent Nav Scrollspy
+    updateScrollspy(scroll);
+  }
+
+  function initSmoothScroll() {
+    if (typeof Lenis !== 'undefined') {
+      try {
+        lenis = new Lenis(SCROLL_CONFIG);
+
+        lenis.on('scroll', ({ scroll, progress }) => {
+          handleScrollUpdate(scroll, progress);
+        });
+
+        function raf(time) {
+          if (lenis && isSmoothScrollActive) {
+            lenis.raf(time);
+          }
+          requestAnimationFrame(raf);
+        }
+        requestAnimationFrame(raf);
+
+        isSmoothScrollActive = true;
+        window.lenis = lenis;
+      } catch (err) {
+        console.warn('Lenis initialization fallback:', err);
+        setupNativeScrollFallback();
+      }
+    } else {
+      setupNativeScrollFallback();
+    }
+  }
+
+  function setupNativeScrollFallback() {
+    window.addEventListener('scroll', () => {
+      const scroll = window.scrollY || window.pageYOffset;
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = maxScroll > 0 ? scroll / maxScroll : 0;
+      handleScrollUpdate(scroll, progress);
+    }, { passive: true });
+  }
+
+  // Smooth scroll for all internal anchor links via Lenis
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      const targetId = this.getAttribute('href');
+      if (targetId && targetId !== '#') {
+        const targetElement = document.querySelector(targetId);
+        if (targetElement) {
+          e.preventDefault();
+          if (lenis && isSmoothScrollActive) {
+            lenis.scrollTo(targetElement, { offset: -75, duration: 1.15 });
+          } else {
+            targetElement.scrollIntoView({ behavior: 'smooth' });
+          }
+
+          // Close mobile menu if open
+          const navMenu = document.querySelector('.nav-menu');
+          if (navMenu && navMenu.classList.contains('open')) {
+            navMenu.classList.remove('open');
+          }
+        }
+      }
+    });
+  });
+
+  // Back to Top button click
+  if (backToTopBtn) {
+    backToTopBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (lenis && isSmoothScrollActive) {
+        lenis.scrollTo(0, { duration: 1.15 });
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
+  }
+
+  // Initialize smooth scroll engine
+  initSmoothScroll();
+
+  // Scroll Reveal 3D Observer with Smooth Cinematic Stagger
+  const revealElements = document.querySelectorAll(
+    '.section-header, .service-card-3d-wrap, .project-card, .process-card, .industry-card, .testimonial-card, .cta-card-content, .stats-bar, .deliverable-card'
+  );
+  revealElements.forEach(el => el.classList.add('scroll-reveal-3d'));
+
+  if ('IntersectionObserver' in window) {
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+        }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -25px 0px' });
+
+    revealElements.forEach(el => revealObserver.observe(el));
+  } else {
+    revealElements.forEach(el => el.classList.add('in-view'));
+  }
+
+});
