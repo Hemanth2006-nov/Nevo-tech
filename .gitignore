@@ -9,3 +9,9 @@ Thumbs.db
 # Python Cache
 __pycache__/
 *.pyc
+
+# Local Database & Environment
+*.db
+*.sqlite3
+.env
+

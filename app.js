@@ -811,23 +811,45 @@ document.addEventListener('DOMContentLoaded', () => {
         const fullName = formData.get('fullName') || 'there';
         const service = formData.get('service') || 'our programs';
         const email = formData.get('email') || '';
+        const phone = formData.get('phone') || '';
+        const institution = formData.get('institution') || '';
+        const domain = formData.get('domain') || '';
+        const message = formData.get('message') || '';
 
-        // Store in localStorage for demo persistence
+        const payload = {
+          fullName: fullName,
+          email: email,
+          phone: phone,
+          service: service,
+          institution: institution,
+          domain: domain,
+          message: message
+        };
+
+        // Send to Flask Backend API
+        fetch('/api/enquiries', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(data => {
+          console.log('[NEVO Backend] Enquiry saved to DB:', data);
+        })
+        .catch(err => {
+          console.warn('[NEVO Backend] API offline or static mode fallback:', err);
+        });
+
+        // Also store in localStorage as client-side backup
         try {
           const stored = JSON.parse(localStorage.getItem('nevo_enquiries') || '[]');
           stored.push({
-            name: fullName,
-            email: email,
-            phone: formData.get('phone') || '',
-            service: service,
-            institution: formData.get('institution') || '',
-            domain: formData.get('domain') || '',
-            message: formData.get('message') || '',
+            ...payload,
             timestamp: new Date().toISOString()
           });
           localStorage.setItem('nevo_enquiries', JSON.stringify(stored));
         } catch (err) {
-          console.warn('Local storage error:', err);
+          console.warn('Local storage backup error:', err);
         }
 
         setTimeout(() => {
