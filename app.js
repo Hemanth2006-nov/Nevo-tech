@@ -728,4 +728,134 @@ document.addEventListener('DOMContentLoaded', () => {
     revealElements.forEach(el => el.classList.add('in-view'));
   }
 
+
+  // =================================================================
+  // ONLINE SERVICE ENQUIRY & MODAL SUITE (ZERO AMOUNT ARCHITECTURE)
+  // =================================================================
+  function initEnquirySuite() {
+    const modal = document.getElementById('enquiry-modal');
+    const closeBtn = document.getElementById('enquiry-modal-close');
+    const modalSelect = document.getElementById('modal-service-select');
+
+    window.openEnquiryModal = function(serviceName) {
+      if (!modal) return;
+      if (modalSelect && serviceName) {
+        for (let i = 0; i < modalSelect.options.length; i++) {
+          if (modalSelect.options[i].text.toLowerCase().includes(serviceName.toLowerCase()) ||
+              modalSelect.options[i].value.toLowerCase().includes(serviceName.toLowerCase())) {
+            modalSelect.selectedIndex = i;
+            break;
+          }
+        }
+      }
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    };
+
+    window.closeEnquiryModal = function() {
+      if (!modal) return;
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+    };
+
+    if (closeBtn) {
+      closeBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.closeEnquiryModal();
+      });
+    }
+
+    if (modal) {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          window.closeEnquiryModal();
+        }
+      });
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal && modal.classList.contains('active')) {
+        window.closeEnquiryModal();
+      }
+    });
+
+    // Wire up all .service-enquiry-btn triggers
+    document.querySelectorAll('.service-enquiry-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const service = btn.getAttribute('data-service') || '';
+        window.openEnquiryModal(service);
+      });
+    });
+
+    // Wire up all .nevo-enquiry-form forms across all pages
+    document.querySelectorAll('.nevo-enquiry-form').forEach(form => {
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const submitBtn = form.querySelector('.btn-enquiry-submit');
+        const originalHtml = submitBtn ? submitBtn.innerHTML : 'Submit Enquiry';
+
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = `
+            <svg class="spin-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" style="animation: spin 0.8s linear infinite;">
+              <circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-linecap="round"/>
+            </svg>
+            <span>Submitting Enquiry...</span>
+          `;
+        }
+
+        const formData = new FormData(form);
+        const fullName = formData.get('fullName') || 'there';
+        const service = formData.get('service') || 'our programs';
+        const email = formData.get('email') || '';
+
+        // Store in localStorage for demo persistence
+        try {
+          const stored = JSON.parse(localStorage.getItem('nevo_enquiries') || '[]');
+          stored.push({
+            name: fullName,
+            email: email,
+            phone: formData.get('phone') || '',
+            service: service,
+            institution: formData.get('institution') || '',
+            domain: formData.get('domain') || '',
+            message: formData.get('message') || '',
+            timestamp: new Date().toISOString()
+          });
+          localStorage.setItem('nevo_enquiries', JSON.stringify(stored));
+        } catch (err) {
+          console.warn('Local storage error:', err);
+        }
+
+        setTimeout(() => {
+          const parentCard = form.parentElement;
+          const successDiv = document.createElement('div');
+          successDiv.className = 'form-success-alert';
+          successDiv.innerHTML = `
+            <div class="form-success-icon">✓</div>
+            <h4>Thank You, ${fullName}!</h4>
+            <p>Your enquiry for <strong>${service}</strong> has been successfully received. Our academic coordinator will contact you at <strong>${email}</strong> with full curriculum briefs and scheduling.</p>
+            <button type="button" class="btn-enquiry-submit" style="max-width: 200px; margin-top: 1rem; padding: 0.6rem 1.2rem; font-size: 0.85rem;" onclick="this.parentElement.previousElementSibling.reset(); this.parentElement.previousElementSibling.style.display='flex'; this.parentElement.remove(); if (window.closeEnquiryModal) window.closeEnquiryModal();">
+              Submit Another Enquiry
+            </button>
+          `;
+
+          form.style.display = 'none';
+          parentCard.appendChild(successDiv);
+
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalHtml;
+          }
+        }, 600);
+      });
+    });
+  }
+
+  // Initialize Enquiry Suite
+  initEnquirySuite();
+
 });
