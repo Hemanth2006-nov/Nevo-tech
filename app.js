@@ -735,22 +735,74 @@ document.addEventListener('DOMContentLoaded', () => {
   function initEnquirySuite() {
     const modal = document.getElementById('enquiry-modal');
     const closeBtn = document.getElementById('enquiry-modal-close');
-    const modalSelect = document.getElementById('modal-service-select');
 
     window.openEnquiryModal = function(serviceName) {
       if (!modal) return;
-      if (modalSelect && serviceName) {
-        for (let i = 0; i < modalSelect.options.length; i++) {
-          if (modalSelect.options[i].text.toLowerCase().includes(serviceName.toLowerCase()) ||
-              modalSelect.options[i].value.toLowerCase().includes(serviceName.toLowerCase())) {
-            modalSelect.selectedIndex = i;
-            break;
-          }
+
+      const lockedWrap = modal.querySelector('#modal-service-locked-wrap');
+      const lockedText = modal.querySelector('#modal-service-display-text');
+      const hiddenInput = modal.querySelector('#modal-service-input');
+      const selectWrap = modal.querySelector('#modal-service-select-wrap');
+      const selectEl = modal.querySelector('#modal-service-select');
+
+      if (serviceName && serviceName.trim() !== '') {
+        // AUTOMATICALLY TAKE SELECTED SERVICE - DO NOT GIVE OPTIONS
+        if (lockedWrap) lockedWrap.style.display = 'block';
+        if (lockedText) lockedText.textContent = serviceName;
+        if (hiddenInput) {
+          hiddenInput.value = serviceName;
+          hiddenInput.disabled = false;
+        }
+        if (selectWrap) selectWrap.style.display = 'none';
+        if (selectEl) selectEl.disabled = true;
+      } else {
+        // Fallback only if opened without a specific service
+        if (lockedWrap) lockedWrap.style.display = 'none';
+        if (hiddenInput) hiddenInput.disabled = true;
+        if (selectWrap) {
+          selectWrap.style.display = 'block';
+          if (selectEl) selectEl.disabled = false;
         }
       }
+
       modal.classList.add('active');
       document.body.style.overflow = 'hidden';
     };
+
+    window.selectHomeService = function(serviceName) {
+      const homeLockedWrap = document.getElementById('home-service-locked-wrap');
+      const homeLockedText = document.getElementById('home-service-display-text');
+      const homeHiddenInput = document.getElementById('home-service-input');
+      const homeSelectWrap = document.getElementById('home-service-select-wrap');
+      const homeSelect = document.getElementById('home-service');
+
+      if (serviceName && serviceName.trim() !== '') {
+        if (homeLockedWrap) homeLockedWrap.style.display = 'block';
+        if (homeLockedText) homeLockedText.textContent = serviceName;
+        if (homeHiddenInput) {
+          homeHiddenInput.value = serviceName;
+          homeHiddenInput.disabled = false;
+        }
+        if (homeSelectWrap) homeSelectWrap.style.display = 'none';
+        if (homeSelect) homeSelect.disabled = true;
+      } else {
+        if (homeLockedWrap) homeLockedWrap.style.display = 'none';
+        if (homeHiddenInput) homeHiddenInput.disabled = true;
+        if (homeSelectWrap) homeSelectWrap.style.display = 'block';
+        if (homeSelect) homeSelect.disabled = false;
+      }
+    };
+
+    // Check URL parameters for preselected service
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const serviceParam = urlParams.get('service');
+      if (serviceParam) {
+        window.selectHomeService(serviceParam);
+      }
+    } catch (e) {
+      // Ignore URL parsing errors
+    }
 
     window.closeEnquiryModal = function() {
       if (!modal) return;

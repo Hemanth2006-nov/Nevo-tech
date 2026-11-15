@@ -3214,6 +3214,74 @@ html.lenis, html.lenis body {
   font-size: 0.88rem;
 }
 
+/* Auto-selected Service Locked Card (No dropdown, zero options) */
+.service-selected-locked-card {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.8rem 1.1rem;
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: var(--radius-md);
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.1) inset;
+  transition: all var(--transition-fast);
+}
+
+.service-selected-locked-card:hover {
+  border-color: rgba(56, 189, 248, 0.6);
+  background: rgba(56, 189, 248, 0.12);
+}
+
+.service-selected-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(56, 189, 248, 0.18);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  color: #38bdf8;
+  flex-shrink: 0;
+}
+
+.service-selected-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.service-selected-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.service-selected-sub {
+  font-size: 0.74rem;
+  color: #94a3b8;
+  margin-top: 0.15rem;
+}
+
+.service-selected-tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.22rem 0.55rem;
+  border-radius: 9999px;
+  background: rgba(37, 211, 102, 0.15);
+  color: #25d366;
+  border: 1px solid rgba(37, 211, 102, 0.35);
+  flex-shrink: 0;
+}
+
+
 /* Submit Button & Trust Note */
 .btn-enquiry-submit {
   width: 100%;
