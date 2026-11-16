@@ -2124,6 +2124,26 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--color-highlight);
 }
 
+.footer-admin-link {
+  color: #38bdf8 !important;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 4px;
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  transition: all var(--transition-fast) !important;
+}
+
+.footer-admin-link:hover {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: rgba(56, 189, 248, 0.5);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+  color: #ffffff !important;
+}
+
 /* ===================================================================
    INTERACTIVE MODALS & 3D CALCULATORS
    =================================================================== */
