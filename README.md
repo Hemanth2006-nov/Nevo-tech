@@ -1,70 +1,141 @@
-# NEVO TECH — 3D Modern Interactive Website
+# NEVO TECH — Full-Stack Interactive Platform & Admin Dashboard
 
-Designed and built based on the **NEVO -TECH-** UI/UX Design System Specification (`Palette 03 - Graphite + Silver + Ice Blue`).
+Engineered with a high-performance **Dark Cyber** UI/UX design system (`Palette 03 - Graphite + Cyber Cyan + Emerald Green`), powered by a **Flask** backend with **Supabase PostgreSQL** cloud persistence and a full-featured **Admin Dashboard**.
 
 ---
 
-## 🌟 Live Preview
+## 🌟 Quick Start & Running Locally
 
-The website is running on your local machine:
-👉 **[http://localhost:5500/](http://localhost:5500/)**
+### 1. Prerequisites
+- Python 3.10+ installed
 
-To launch or stop the server manually:
-```powershell
-# In PowerShell:
-python -m http.server 5500
+### 2. Install Dependencies
+```bash
+pip install -r requirements.txt
 ```
-Then visit `http://localhost:5500` in Google Chrome, Microsoft Edge, Brave, or any modern browser.
+
+### 3. Environment Configuration
+Copy `.env.example` to `.env` (or configure your own variables):
+```bash
+cp .env.example .env
+```
+
+Default `.env` configuration:
+```ini
+DATABASE_URL=[REDACTED DATABASE URL]
+PORT=5000
+SECRET_KEY=[REDACTED]
+ADMIN_PASSWORD=[REDACTED]
+FLASK_ENV=development
+```
+
+### 4. Run the Backend Server
+```bash
+python server.py
+```
+The server will start on **http://localhost:5000/** with direct connection to Supabase PostgreSQL.
 
 ---
 
-## 🚀 Key 3D Features & Capabilities
+## 🔐 Admin Dashboard
 
-0. **Stylish Smooth Preloader (NEVO Intro)**:
-   - Fullscreen cyber intro with ambient radial glow and matrix floor lines.
-   - **NEVO Winged-N 3D Emblem** with dual radar waves and pulsing light rings.
-   - **Stylized "NEVO" Typography** with metallic shimmering light sweep across each letter (`N-E-V-O`).
-   - Flanking laser lines with futuristic `T E C H` badge.
-   - Real-time animated cyber progress bar (`0% -> 100%`) with dynamic system status messages (*Initializing Neural Core*, *Synchronizing 3D Environment*, *Calibrating Tilt & Lighting*, *System Ready*).
-   - Smooth cinematic slide-up reveal transitioning seamlessly into the 3D Hero scene.
-   - Can be replayed anytime by clicking the **NEVO — TECH —** logo in the top navbar.
+The Admin Dashboard provides real-time oversight of all student and corporate inquiries.
 
-1. **Hero Atmospheric Backdrop & Floating Stats Bar (Hero Section)**:
-   - Clean cyber grid backdrop and ice-blue radial atmosphere without background screenshot clutter.
-   - Centered headline, CTAs (`Explore Our Services →`, `Watch Our Story`), and 3-column metrics bar (`50+ Projects Delivered`, `25+ Businesses Served`, `99% Client Satisfaction`).
+| Access Point | URL | Credentials / Notes |
+| :--- | :--- | :--- |
+| **Admin Portal** | [http://localhost:5000/admin](http://localhost:5000/admin) | Password: `admin123` |
+| **Admin Login** | [http://localhost:5000/admin/login](http://localhost:5000/admin/login) | Protected Session Authentication |
+| **CSV Export** | [http://localhost:5000/admin/export-csv](http://localhost:5000/admin/export-csv) | One-click lead export for CRM |
+| **Public Site** | [http://localhost:5000/](http://localhost:5000/) | Live website with enquiry forms |
 
-2. **4 Core Service Tracks & Dedicated Pages (`#services`)**:
-   - Interactive 2×2 3D-tilt service cards linking directly to dedicated detail pages, plus a `Services ▾` navbar dropdown and Footer directory:
-     - **Technical Internship Programs** (`service-technical-internships.html`)
-     - **Business & Analytics Internship** (`service-business-analytics-internship.html`)
-     - **Customized Technical Projects & Documentation** (`service-custom-projects-documentation.html`)
-     - **Survey-Based Projects & Research Reports** (`service-survey-research-reports.html`)
+### Admin Features:
+- **KPI Metrics**: Real-time counters for Total Inquiries, New Leads, In Progress, and Enrolled conversions.
+- **Database Status Indicator**: Live pill displaying cloud database connectivity status.
+- **Live Search & Multi-Filter**: Filter leads instantly by Program Track or Lead Status (`New`, `Contacted`, `In Progress`, `Enrolled`, `Closed`), and search by applicant name, email, or institution.
+- **Inline Status Management**: Change candidate pipeline status via AJAX dropdown with instant UI feedback.
+- **Quick-Actions**: Direct click-to-email (`mailto:`) and click-to-call (`tel:`) shortcuts.
+- **Modal Lead Inspector**: View full details, academic institutions, focus domains, and client requirements.
 
-3. **Silky Frictionless Lenis Smooth Scroll**:
-   - Effortless, ultra-fluid scrolling in both directions (completely removed all upward scroll resistance / effort).
-   - Uniform `wheelMultiplier: 1.0` and `touchMultiplier: 1.5` with exponential deceleration.
-   - Top viewport glowing ice-blue scroll progress line.
-   - Optional DO / UNDO smooth scroll toggle anytime (Press **`S`**).
+---
 
-3. **Technical 3D Diagnostics Reel Modal ("Watch Our Story")**:
-   - Live interactive 3D particle lattice & neural core canvas (`#story-neural-canvas`).
-   - Real-time telemetry feed: `INFERENCE: 12ms · 128 TENSOR NODES · SLA: 99.99%`.
+## 📋 Service Tracks & Auto-Select Architecture
 
-4. **3D WebGL Fluid Wave Ribbons (CTA Banner)**:
-   - Interactive waving 3D fluid mesh that undulates and responds to mouse motion.
+All consultation forms strictly require **zero amount / pricing options**, focusing purely on academic and technical alignment.
 
-5. **Interactive Sound FX Synthesizer (Web Audio API)**:
-   - Synthesizes subtle futuristic chimes, button clicks, and modal opening tones with zero external audio dependencies.
-   - Mute/Unmute toggle button with sound wave status in the navigation bar.
+Whenever a visitor clicks on a specific service track, the system **automatically locks in the selected program** without presenting any dropdown options:
 
-6. **Interactive "Get a Quote" 3D Project Estimator Modal**:
-   - Dynamic budget slider with instant estimated project range calculation.
-   - Form submission with celebratory **confetti burst** (`canvas-confetti`) and toast notification.
+1. **Technical Internship Programs** (`service-technical-internships.html`)
+   - Software engineering, AI/ML, and cloud systems with mentor code reviews.
+2. **Business & Analytics Internship** (`service-business-analytics-internship.html`)
+   - Applied training in BI dashboards, market audits, and data strategy.
+3. **Customized Technical Projects & Documentation** (`service-custom-projects-documentation.html`)
+   - Custom implementations with full source code, UML diagrams, and IEEE reports.
+4. **Survey-Based Projects & Research Reports** (`service-survey-research-reports.html`)
+   - Questionnaire design, statistical tabulations, and market research synthesis.
 
-7. **Interactive Testimonial Carousel**:
-   - Featuring client quote from **Rohan Mehta** (Founder, TechCraft), star ratings, avatar, and previous/next carousel controls.
+---
 
-8. **Design System Adherence**:
-   - **Color Palette 03**: Graphite (`#17191d`), Secondary (`#202530`), Accent (`#A8B9C5`), Highlight Ice Blue (`#89E3F5` / `#38BDF8`), Light Background (`#F4F6F8`).
-   - **Typography**: *Plus Jakarta Sans* (Headings) & *Inter* (Body).
-   - **Responsive Breakpoints**: Seamlessly adapts to mobile, tablet, laptop, and ultra-wide displays.
+## 🔌 API Reference
+
+### Submit Enquiry
+- **Endpoint**: `POST /api/enquiries`
+- **Access**: Public
+- **Headers**: `Content-Type: application/json`
+- **Request Body**:
+```json
+{
+  "fullName": "Student Name",
+  "email": "student@example.com",
+  "phone": "+91 98765 43210",
+  "service": "Technical Internship Programs",
+  "institution": "PES University",
+  "domain": "AI & Cloud DevOps",
+  "message": "Interested in joining the upcoming cohort."
+}
+```
+- **Response**: `201 Created`
+
+### List Enquiries
+- **Endpoint**: `GET /api/enquiries`
+- **Access**: Admin session required
+- **Query Params**: `service` (optional), `status` (optional)
+
+### Update Lead Status
+- **Endpoint**: `PATCH /api/enquiries/<id>`
+- **Access**: Admin session required
+- **Payload**: `{"status": "Contacted", "notes": "Called candidate"}`
+
+---
+
+## 🛠️ Project Structure
+
+```
+├── .env.example                               # Environment template
+├── db.py                                      # Supabase Postgres + resilient fallback database layer
+├── server.py                                  # Flask application server & API routes
+├── requirements.txt                           # Python dependencies
+├── app.js                                     # Frontend interactions, auto-select logic & API integration
+├── styles.css                                 # Cyber Dark theme stylesheet
+├── index.html                                 # Main landing page
+├── service-technical-internships.html         # Technical Internship Track
+├── service-business-analytics-internship.html # Business Analytics Track
+├── service-custom-projects-documentation.html # Custom Projects Track
+├── service-survey-research-reports.html       # Survey Research Track
+├── templates/
+│   ├── admin.html                             # Admin Dashboard UI
+│   └── admin_login.html                       # Admin Login portal
+└── assets/                                    # Logos, SVGs, and brand media
+```
+
+---
+
+## 🌐 Production Deployment Guide
+
+Deploy easily on **Render**, **Railway**, **Fly.io**, or any cloud VPS:
+1. Connect your GitHub repository: `https://github.com/Hemanth2006-nov/Nevo-tech.git`
+2. Set Environment Variables:
+   - `DATABASE_URL`: Your Supabase connection string.
+   - `ADMIN_PASSWORD`: Your custom admin password.
+   - `SECRET_KEY`: A random secure key.
+3. Build Command: `pip install -r requirements.txt`
+4. Start Command: `python server.py` (or `gunicorn server:app`)
