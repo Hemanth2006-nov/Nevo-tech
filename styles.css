@@ -651,6 +651,32 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 8px 25px rgba(56, 189, 248, 0.55);
 }
 
+.btn-pill-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #89e3f5 0%, #38bdf8 100%);
+  color: #0b132b !important;
+  font-family: var(--font-heading);
+  font-size: 0.92rem;
+  font-weight: 700;
+  padding: 0.75rem 1.4rem;
+  border-radius: var(--radius-pill);
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(56, 189, 248, 0.35);
+  transition: all var(--transition-smooth);
+}
+
+.btn-pill-primary:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #0ea5e9 0%, #7dd3fc 100%);
+  box-shadow: 0 8px 25px rgba(56, 189, 248, 0.6);
+  color: #050811 !important;
+}
+
 /* WhatsApp Action Button (Vibrant, Trustworthy, High-Converting) */
 .btn-whatsapp {
   display: inline-flex;
