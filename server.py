@@ -1,190 +1,498 @@
-import os
 import csv
+import hmac
 import io
-from flask import (
-    Flask, render_template, request, jsonify, redirect, 
-    url_for, session, send_from_directory, Response
-)
+import json
+import logging
+import os
+import re
+import secrets
+import smtplib
+import urllib.error
+import urllib.parse
+import urllib.request
+from email.message import EmailMessage
+
 from dotenv import load_dotenv
-import db
+from flask import (
+    Flask, abort, jsonify, make_response, redirect, render_template, request,
+    send_from_directory, session, url_for, Response
+)
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from werkzeug.security import check_password_hash
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 load_dotenv()
 
-app = Flask(__name__, template_folder="templates", static_folder=".")
-app.secret_key = os.environ.get("SECRET_KEY", "nevo_secret_key_prod_2026")
+logging.basicConfig(
+    level=os.environ.get("LOG_LEVEL", "INFO").upper(),
+    format="%(asctime)s %(levelname)s %(name)s %(message)s",
+)
+logger = logging.getLogger("nevo")
 
-ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin123")
+import db
 
-# Initialize database schema on startup
-with app.app_context():
+APP_ENV = os.environ.get("APP_ENV", "development").lower()
+IS_PRODUCTION = APP_ENV == "production"
+SECRET_KEY = os.environ.get("SECRET_KEY")
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD")
+ADMIN_PASSWORD_HASH = os.environ.get("ADMIN_PASSWORD_HASH")
+ADMIN_AUTH_CONFIGURED = bool(ADMIN_PASSWORD or ADMIN_PASSWORD_HASH)
+TURNSTILE_SITE_KEY = os.environ.get("TURNSTILE_SITE_KEY", "").strip()
+TURNSTILE_SECRET_KEY = os.environ.get("TURNSTILE_SECRET_KEY", "").strip()
+TURNSTILE_REQUIRED = os.environ.get("TURNSTILE_REQUIRED", "false").lower() in {"1", "true", "yes"}
+
+if IS_PRODUCTION:
+    if not SECRET_KEY or len(SECRET_KEY) < 32:
+        raise RuntimeError("Production requires a SECRET_KEY of at least 32 characters")
+    if not ADMIN_PASSWORD_HASH and (not ADMIN_PASSWORD or len(ADMIN_PASSWORD) < 14):
+        raise RuntimeError("Production requires ADMIN_PASSWORD_HASH or an ADMIN_PASSWORD of at least 14 characters")
+if bool(TURNSTILE_SITE_KEY) != bool(TURNSTILE_SECRET_KEY):
+    raise RuntimeError("Set both TURNSTILE_SITE_KEY and TURNSTILE_SECRET_KEY")
+if TURNSTILE_REQUIRED and not TURNSTILE_SITE_KEY:
+    raise RuntimeError("Turnstile is required but its site and secret keys are not configured")
+if IS_PRODUCTION:
+    email_notifications_configured = bool(
+        os.environ.get("SMTP_HOST")
+        and os.environ.get("SMTP_FROM")
+        and os.environ.get("NOTIFICATION_EMAIL_TO")
+    )
+    webhook_url = os.environ.get("LEAD_WEBHOOK_URL", "").strip()
+    if not email_notifications_configured and not webhook_url:
+        raise RuntimeError("Production requires SMTP notification settings or LEAD_WEBHOOK_URL")
+    if webhook_url and not webhook_url.startswith("https://"):
+        raise RuntimeError("Production LEAD_WEBHOOK_URL must use HTTPS")
+
+app = Flask(__name__, template_folder="templates", static_folder=None)
+app.secret_key = SECRET_KEY or secrets.token_urlsafe(32)
+app.config.update(
+    MAX_CONTENT_LENGTH=16 * 1024,
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SECURE=IS_PRODUCTION,
+    SESSION_COOKIE_SAMESITE="Lax",
+    PERMANENT_SESSION_LIFETIME=60 * 60 * 8,
+)
+
+if os.environ.get("TRUST_PROXY", "false").lower() in {"1", "true", "yes"}:
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
+
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    storage_uri=os.environ.get("RATELIMIT_STORAGE_URI", "memory://"),
+    default_limits=[],
+)
+
+try:
+    db.init_db()
+except Exception:
+    logger.exception("Database schema initialization failed")
+    raise
+
+
+def _admin_password_matches(candidate):
+    if ADMIN_PASSWORD_HASH:
+        try:
+            return check_password_hash(ADMIN_PASSWORD_HASH, candidate)
+        except ValueError:
+            logger.error("ADMIN_PASSWORD_HASH is not a valid Werkzeug password hash")
+            return False
+    return bool(ADMIN_PASSWORD) and hmac.compare_digest(candidate, ADMIN_PASSWORD)
+
+
+def _csrf_token():
+    token = session.get("_csrf_token")
+    if not token:
+        token = secrets.token_urlsafe(32)
+        session["_csrf_token"] = token
+    return token
+
+
+def _valid_csrf_token():
+    expected = session.get("_csrf_token", "")
+    supplied = request.headers.get("X-CSRFToken") or request.form.get("csrf_token", "")
+    return bool(expected and supplied and hmac.compare_digest(expected, supplied))
+
+
+def _require_admin():
+    if not session.get("is_admin"):
+        return jsonify({"success": False, "error": "Unauthorized"}), 401
+    if not _valid_csrf_token():
+        return jsonify({"success": False, "error": "Invalid or missing CSRF token"}), 403
+    return None
+
+
+def _verify_turnstile(token):
+    if not TURNSTILE_SITE_KEY:
+        return not TURNSTILE_REQUIRED
+    if not token:
+        return False
+
+    body = urllib.parse.urlencode({
+        "secret": TURNSTILE_SECRET_KEY,
+        "response": token,
+        "remoteip": request.remote_addr or "",
+    }).encode("utf-8")
+    req = urllib.request.Request(
+        "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+        data=body,
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+        method="POST",
+    )
     try:
-        db.init_db()
-    except Exception as e:
-        print("[Startup Warning] DB init error:", e)
+        with urllib.request.urlopen(req, timeout=5) as response:
+            result = json.loads(response.read(4096).decode("utf-8"))
+        return isinstance(result, dict) and result.get("success") is True
+    except (urllib.error.URLError, TimeoutError, ValueError, UnicodeDecodeError):
+        logger.exception("Turnstile verification request failed")
+        return False
 
 
-# =====================================================================
-# STATIC & WEBSITE ROUTES
-# =====================================================================
-@app.route("/")
+def _send_notifications(enquiry, enquiry_id):
+    recipient = os.environ.get("NOTIFICATION_EMAIL_TO", "").strip()
+    smtp_host = os.environ.get("SMTP_HOST", "").strip()
+    if recipient and smtp_host:
+        message = EmailMessage()
+        message["Subject"] = f"New NEVO TECH enquiry #{enquiry_id}"
+        message["From"] = os.environ.get("SMTP_FROM", os.environ.get("SMTP_USER", "")).strip()
+        message["To"] = recipient
+        message.set_content(
+            "A new enquiry was saved.\n\n"
+            f"Name: {enquiry['fullName']}\n"
+            f"Email: {enquiry['email']}\n"
+            f"Phone: {enquiry['phone']}\n"
+            f"Service: {enquiry['service']}\n"
+            f"Institution: {enquiry['institution']}\n"
+            f"Domain: {enquiry['domain']}\n"
+            f"Message: {enquiry['message']}\n"
+            f"Enquiry ID: {enquiry_id}\n"
+        )
+        try:
+            port = int(os.environ.get("SMTP_PORT", "587"))
+            use_ssl = os.environ.get("SMTP_USE_SSL", "false").lower() in {"1", "true", "yes"}
+            smtp_class = smtplib.SMTP_SSL if use_ssl else smtplib.SMTP
+            with smtp_class(smtp_host, port, timeout=5) as smtp:
+                if not use_ssl and os.environ.get("SMTP_USE_TLS", "true").lower() in {"1", "true", "yes"}:
+                    smtp.starttls()
+                smtp_user = os.environ.get("SMTP_USER", "")
+                smtp_password = os.environ.get("SMTP_PASSWORD", "")
+                if smtp_user:
+                    smtp.login(smtp_user, smtp_password)
+                smtp.send_message(message)
+        except (OSError, smtplib.SMTPException, ValueError):
+            logger.exception("Email notification failed for enquiry id=%s", enquiry_id)
+
+    webhook_url = os.environ.get("LEAD_WEBHOOK_URL", "").strip()
+    if webhook_url:
+        payload = json.dumps({
+            "event": "enquiry.created",
+            "id": enquiry_id,
+            "enquiry": enquiry,
+        }).encode("utf-8")
+        req = urllib.request.Request(
+            webhook_url,
+            data=payload,
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=5) as response:
+                if response.status >= 400:
+                    logger.error("Lead webhook returned HTTP %s for enquiry id=%s", response.status, enquiry_id)
+        except (urllib.error.URLError, TimeoutError, ValueError):
+            logger.exception("Lead webhook failed for enquiry id=%s", enquiry_id)
+
+
+@app.before_request
+def ensure_csrf_token():
+    if request.endpoint in {"admin_login", "admin_dashboard"}:
+        _csrf_token()
+
+
+@app.after_request
+def add_security_headers(response):
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("X-Frame-Options", "DENY")
+    response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+    response.headers.setdefault("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
+    if request.is_secure:
+        response.headers.setdefault("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+    return response
+
+
+@app.get("/")
 def index():
     return send_from_directory(".", "index.html")
 
+
+@app.get("/api/public-config")
+def public_config():
+    return jsonify({
+        "turnstileSiteKey": TURNSTILE_SITE_KEY,
+        "turnstileRequired": TURNSTILE_REQUIRED,
+    })
+
+
+@app.get("/health/live")
+def health_live():
+    return jsonify({"status": "ok"})
+
+
+@app.get("/health/ready")
+def health_ready():
+    try:
+        db.check_db()
+    except Exception:
+        logger.exception("Readiness database check failed")
+        return jsonify({"status": "not_ready", "database": "unavailable"}), 503
+    return jsonify({"status": "ready", "database": db.DB_STATUS})
+
+
 @app.route("/<path:path>")
 def static_proxy(path):
-    if os.path.exists(path):
+    if path.startswith("assets/") and not any(part.startswith(".") for part in path.split("/")):
         return send_from_directory(".", path)
-    return send_from_directory(".", "index.html")
+    if "/" not in path and os.path.splitext(path)[1].lower() in {".html", ".css", ".js"}:
+        if os.path.isfile(path):
+            return send_from_directory(".", path)
+    abort(404)
 
 
-# =====================================================================
-# API ROUTES (ENQUIRIES SUBMISSION & MANAGEMENT)
-# =====================================================================
-@app.route("/api/enquiries", methods=["POST"])
+@app.errorhandler(404)
+def not_found(_error):
+    if request.path.startswith("/api/") or request.path.startswith("/health/"):
+        return jsonify({"success": False, "error": "Not found"}), 404
+    return "<!doctype html><title>Not found</title><h1>Page not found</h1>", 404
+
+
+@app.errorhandler(413)
+def request_too_large(_error):
+    return jsonify({"success": False, "error": "Request is too large"}), 413
+
+
+@app.errorhandler(429)
+def rate_limit_exceeded(_error):
+    if request.path.startswith("/api/"):
+        return jsonify({"success": False, "error": "Too many requests. Please try again later."}), 429
+    return "<!doctype html><title>Too many requests</title><h1>Please try again later</h1>", 429
+
+
+@app.errorhandler(500)
+def internal_server_error(_error):
+    logger.error("Request failed with HTTP 500")
+    if request.path.startswith("/api/"):
+        return jsonify({"success": False, "error": "An internal error occurred. Please try again later."}), 500
+    return "<!doctype html><title>Server error</title><h1>Something went wrong</h1>", 500
+
+
+@app.post("/api/enquiries")
+@limiter.limit("5 per minute")
 def submit_enquiry():
+    data = request.get_json(silent=True) if request.is_json else request.form.to_dict()
+    if not isinstance(data, dict) or not data:
+        return jsonify({"success": False, "error": "A valid enquiry is required"}), 400
+
+    if str(data.get("website", "")).strip():
+        return jsonify({"success": True, "message": "Enquiry submitted successfully"}), 202
+    if not _verify_turnstile(str(data.get("captchaToken", "")).strip()):
+        return jsonify({"success": False, "error": "Please complete the verification and try again."}), 400
+
+    fields = {
+        "fullName": str(data.get("fullName", "")).strip(),
+        "email": str(data.get("email", "")).strip(),
+        "phone": str(data.get("phone", "")).strip(),
+        "service": str(data.get("service", "")).strip(),
+        "institution": str(data.get("institution", "")).strip(),
+        "domain": str(data.get("domain", "")).strip(),
+        "message": str(data.get("message", "")).strip(),
+    }
+    if not fields["fullName"] or len(fields["fullName"]) > 120:
+        return jsonify({"success": False, "error": "Enter a name no longer than 120 characters."}), 400
+    if len(fields["email"]) > 254 or not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", fields["email"]):
+        return jsonify({"success": False, "error": "Enter a valid email address."}), 400
+    phone_digits = re.sub(r"\D", "", fields["phone"])
+    if (
+        not re.fullmatch(r"[0-9+().\-\s]{7,30}", fields["phone"])
+        or not 7 <= len(phone_digits) <= 15
+    ):
+        return jsonify({"success": False, "error": "Enter a valid phone number."}), 400
+    valid_services = {
+        "Technical Internship Programs",
+        "Business & Analytics Internship",
+        "Customized Technical Projects & Documentation",
+        "Survey-Based Projects & Research Reports",
+        "General Academic Partnership",
+    }
+    if fields["service"] not in valid_services:
+        return jsonify({"success": False, "error": "Select a service."}), 400
+    if any(len(fields[field]) > limit for field, limit in (
+        ("institution", 160), ("domain", 160), ("message", 4000)
+    )):
+        return jsonify({"success": False, "error": "One or more fields exceed the allowed length."}), 400
+
     try:
-        data = request.get_json(force=True) if request.is_json else request.form.to_dict()
-        if not data:
-            return jsonify({"success": False, "error": "No data received"}), 400
+        saved = db.insert_enquiry(fields)
+    except Exception:
+        logger.exception("Could not save an enquiry")
+        return jsonify({"success": False, "error": "We could not save your enquiry. Please try again shortly."}), 503
 
-        full_name = data.get("fullName", "").strip()
-        email = data.get("email", "").strip()
-        phone = data.get("phone", "").strip()
-
-        if not full_name or not email or not phone:
-            return jsonify({"success": False, "error": "Name, email, and phone are required."}), 400
-
-        res = db.insert_enquiry(data)
-        return jsonify({
-            "success": True,
-            "message": "Enquiry submitted successfully! Our academic coordinator will contact you shortly.",
-            "data": res
-        }), 201
-
-    except Exception as e:
-        print("[API Error] submit_enquiry error:", e)
-        return jsonify({"success": False, "error": str(e)}), 500
+    _send_notifications(fields, saved["id"])
+    return jsonify({
+        "success": True,
+        "message": "Enquiry submitted successfully. Our team will contact you shortly.",
+        "data": saved,
+    }), 201
 
 
-@app.route("/api/enquiries", methods=["GET"])
+@app.get("/api/enquiries")
 def list_enquiries():
     if not session.get("is_admin"):
         return jsonify({"success": False, "error": "Unauthorized"}), 401
-    
-    service = request.args.get("service")
-    status = request.args.get("status")
-    search = request.args.get("search")
-    enquiries = db.get_all_enquiries(service, status, search)
+    enquiries = db.get_all_enquiries(
+        request.args.get("service"),
+        request.args.get("status"),
+        request.args.get("search"),
+    )
     return jsonify({"success": True, "enquiries": enquiries})
 
 
-@app.route("/api/enquiries/<int:enquiry_id>", methods=["PATCH"])
+@app.patch("/api/enquiries/<int:enquiry_id>")
 def update_enquiry(enquiry_id):
-    if not session.get("is_admin"):
-        return jsonify({"success": False, "error": "Unauthorized"}), 401
+    auth_error = _require_admin()
+    if auth_error:
+        return auth_error
 
-    data = request.get_json() or {}
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify({"success": False, "error": "A valid JSON object is required."}), 400
     status = data.get("status")
     notes = data.get("notes")
+    allowed_statuses = {"New", "Contacted", "In Review", "In Progress", "Enrolled", "Closed"}
+    if not isinstance(status, str) or status not in allowed_statuses:
+        return jsonify({"success": False, "error": "Choose a valid enquiry status."}), 400
+    if notes is not None and (not isinstance(notes, str) or len(notes) > 4000):
+        return jsonify({"success": False, "error": "Notes must be no longer than 4000 characters."}), 400
 
-    if not status:
-        return jsonify({"success": False, "error": "Status is required"}), 400
-
-    db.update_enquiry_status(enquiry_id, status, notes)
+    changed = db.update_enquiry_status(enquiry_id, status, notes)
+    if not changed:
+        return jsonify({"success": False, "error": "Enquiry not found."}), 404
     return jsonify({"success": True, "message": "Status updated successfully"})
 
 
-@app.route("/api/enquiries/<int:enquiry_id>", methods=["DELETE"])
+@app.delete("/api/enquiries/<int:enquiry_id>")
 def delete_enquiry_route(enquiry_id):
-    if not session.get("is_admin"):
-        return jsonify({"success": False, "error": "Unauthorized"}), 401
-
-    db.delete_enquiry(enquiry_id)
+    auth_error = _require_admin()
+    if auth_error:
+        return auth_error
+    if not db.delete_enquiry(enquiry_id):
+        return jsonify({"success": False, "error": "Enquiry not found."}), 404
     return jsonify({"success": True, "message": "Enquiry deleted successfully"})
 
 
-# =====================================================================
-# ADMIN DASHBOARD & AUTHENTICATION
-# =====================================================================
 @app.route("/admin/login", methods=["GET", "POST"])
+@limiter.limit("5 per minute", methods=["POST"])
 def admin_login():
     error = None
+    if not ADMIN_AUTH_CONFIGURED:
+        return render_template(
+            "admin_login.html",
+            error="Admin login is not configured. Set ADMIN_PASSWORD locally before signing in.",
+            csrf_token=_csrf_token(),
+            login_enabled=False,
+        ), 503
     if request.method == "POST":
-        pwd = request.form.get("password", "")
-        if pwd == ADMIN_PASSWORD:
+        if not _valid_csrf_token():
+            return render_template(
+                "admin_login.html",
+                error="Your session expired. Please try again.",
+                csrf_token=_csrf_token(),
+                login_enabled=True,
+            ), 400
+        password = request.form.get("password", "")
+        if _admin_password_matches(password):
+            session.clear()
             session["is_admin"] = True
+            session.permanent = True
+            _csrf_token()
+            db.record_audit_event("admin", "login_success")
             return redirect(url_for("admin_dashboard"))
-        else:
-            error = "Invalid administrator password. Please try again."
-
-    return render_template("admin_login.html", error=error)
-
-
-@app.route("/admin/logout")
-def admin_logout():
-    session.pop("is_admin", None)
-    return redirect(url_for("admin_login"))
-
-
-@app.route("/admin")
-@app.route("/admin/dashboard")
-def admin_dashboard():
-    if not session.get("is_admin"):
-        return redirect(url_for("admin_login"))
-
-    service_filter = request.args.get("service")
-    status_filter = request.args.get("status")
-    search = request.args.get("search")
-
-    enquiries = db.get_all_enquiries(service_filter, status_filter, search)
-    stats = db.get_stats()
+        error = "Invalid administrator password. Please try again."
 
     return render_template(
-        "admin.html",
-        enquiries=enquiries,
-        stats=stats,
-        service_filter=service_filter,
-        status_filter=status_filter,
-        search=search
+        "admin_login.html",
+        error=error,
+        csrf_token=_csrf_token(),
+        login_enabled=True,
     )
 
 
-@app.route("/admin/export-csv")
+@app.post("/admin/logout")
+def admin_logout():
+    if not _valid_csrf_token():
+        abort(403)
+    if session.get("is_admin"):
+        db.record_audit_event("admin", "logout")
+    session.clear()
+    return redirect(url_for("admin_login"))
+
+
+@app.get("/admin")
+@app.get("/admin/dashboard")
+def admin_dashboard():
+    if not session.get("is_admin"):
+        return redirect(url_for("admin_login"))
+    service_filter = request.args.get("service")
+    status_filter = request.args.get("status")
+    search = request.args.get("search")
+    return render_template(
+        "admin.html",
+        enquiries=db.get_all_enquiries(service_filter, status_filter, search),
+        stats=db.get_stats(),
+        service_filter=service_filter,
+        status_filter=status_filter,
+        search=search,
+        csrf_token=_csrf_token(),
+    )
+
+
+@app.post("/admin/export-csv")
 def export_csv():
     if not session.get("is_admin"):
         return redirect(url_for("admin_login"))
-
+    if not _valid_csrf_token():
+        abort(403)
+    db.record_audit_event("admin", "csv_export")
     enquiries = db.get_all_enquiries()
     output = io.StringIO()
     writer = csv.writer(output)
 
-    writer.writerow([
-        "ID", "Date", "Full Name", "Email", "Phone", 
-        "Service Track", "Institution", "Domain", "Message", "Status"
-    ])
+    def safe_cell(value):
+        text = "" if value is None else str(value)
+        if text.startswith(("=", "+", "-", "@", "\t", "\r")):
+            return "'" + text
+        return text
 
+    writer.writerow([
+        "ID", "Date", "Full Name", "Email", "Phone",
+        "Service Track", "Institution", "Domain", "Message", "Status",
+    ])
     for item in enquiries:
         writer.writerow([
-            item.get("id"),
-            item.get("created_at"),
-            item.get("full_name"),
-            item.get("email"),
-            item.get("phone"),
-            item.get("service"),
-            item.get("institution", ""),
-            item.get("domain", ""),
-            item.get("message", "").replace("\n", " "),
-            item.get("status", "New")
+            safe_cell(item.get("id")), safe_cell(item.get("created_at")),
+            safe_cell(item.get("full_name")), safe_cell(item.get("email")),
+            safe_cell(item.get("phone")), safe_cell(item.get("service")),
+            safe_cell(item.get("institution", "")), safe_cell(item.get("domain", "")),
+            safe_cell(item.get("message", "").replace("\n", " ")),
+            safe_cell(item.get("status", "New")),
         ])
-
     return Response(
         output.getvalue(),
         mimetype="text/csv",
-        headers={"Content-Disposition": "attachment;filename=nevo_tech_enquiries.csv"}
+        headers={"Content-Disposition": "attachment; filename=nevo_tech_enquiries.csv"},
     )
 
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    print(f"Starting NEVO TECH Flask Server on port {port}...")
+    logger.info("Starting NEVO TECH Flask Server on port %s", port)
     app.run(host="0.0.0.0", port=port, debug=False)

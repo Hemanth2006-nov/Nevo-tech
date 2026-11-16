@@ -136,12 +136,13 @@
     {% endif %}
 
     <form method="POST" action="/admin/login">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
       <div class="form-group">
         <label class="form-label" for="admin-pwd">Admin Password</label>
-        <input type="password" id="admin-pwd" name="password" class="form-input" placeholder="Enter admin password" required autofocus>
+        <input type="password" id="admin-pwd" name="password" class="form-input" placeholder="Enter admin password" required autofocus {% if not login_enabled %}disabled{% endif %}>
       </div>
 
-      <button type="submit" class="btn-login">Sign In &rarr;</button>
+      <button type="submit" class="btn-login" {% if not login_enabled %}disabled{% endif %}>Sign In &rarr;</button>
     </form>
 
     <a href="/" class="back-link">&larr; Return to NEVO TECH Website</a>

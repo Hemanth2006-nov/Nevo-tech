@@ -1,39 +1,51 @@
 import os
 import sqlite3
 import datetime
+import logging
 from dotenv import load_dotenv
 
 load_dotenv()
 
-DATABASE_URL = os.environ.get(
-    "DATABASE_URL",
-    "[REDACTED DATABASE URL]
-)
+logger = logging.getLogger(__name__)
+APP_ENV = os.environ.get("APP_ENV", "development").lower()
 
-# Test PostgreSQL availability
+
+def normalize_database_url(url):
+    if not url:
+        return None
+    if "sslmode=" not in url:
+        separator = "&" if "?" in url else "?"
+        return f"{url}{separator}sslmode=require"
+    return url
+
+
+DATABASE_URL = normalize_database_url(os.environ.get("DATABASE_URL"))
+
 IS_POSTGRES = False
-DB_STATUS = "Disconnected"
-
-try:
+DB_STATUS = "Local SQLite (development)"
+if DATABASE_URL:
     import psycopg2
     from psycopg2.extras import RealDictCursor
-    # Test connection with a short timeout
-    test_conn = psycopg2.connect(DATABASE_URL, connect_timeout=3)
-    test_conn.close()
-    IS_POSTGRES = True
-    DB_STATUS = "Connected to Supabase PostgreSQL"
-    print("[DB] " + DB_STATUS)
-except Exception as e:
-    IS_POSTGRES = False
-    DB_STATUS = f"Local SQLite Mirror (Supabase direct IPv6 unreachable from current ISP network: {e})"
-    print(f"[DB Warning] {DB_STATUS}")
+    try:
+        test_conn = psycopg2.connect(DATABASE_URL, connect_timeout=5, sslmode="require")
+        test_conn.close()
+        IS_POSTGRES = True
+        DB_STATUS = "Connected to Supabase PostgreSQL"
+        logger.info("Connected to Supabase PostgreSQL")
+    except psycopg2.Error:
+        if APP_ENV == "production":
+            logger.exception("Could not connect to the configured PostgreSQL database")
+            raise
+        logger.exception("Supabase connection failed; using local SQLite for development")
+elif APP_ENV == "production":
+    raise RuntimeError("DATABASE_URL is required in production")
 
 SQLITE_PATH = os.path.join(os.path.dirname(__file__), "nevo_database.db")
 
 
 def get_db():
     if IS_POSTGRES:
-        conn = psycopg2.connect(DATABASE_URL)
+        conn = psycopg2.connect(DATABASE_URL, connect_timeout=10, sslmode="require")
         return conn
     else:
         conn = sqlite3.connect(SQLITE_PATH)
@@ -60,6 +72,16 @@ def init_db():
                 created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
             );
         """)
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS admin_audit_log (
+                id SERIAL PRIMARY KEY,
+                actor VARCHAR(255) NOT NULL,
+                action VARCHAR(50) NOT NULL,
+                enquiry_id INTEGER,
+                details TEXT,
+                occurred_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+            );
+        """)
         conn.commit()
     else:
         cur.execute("""
@@ -77,10 +99,20 @@ def init_db():
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         """)
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS admin_audit_log (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                actor TEXT NOT NULL,
+                action TEXT NOT NULL,
+                enquiry_id INTEGER,
+                details TEXT,
+                occurred_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        """)
         conn.commit()
     cur.close()
     conn.close()
-    print("[DB] Enquiries table initialized successfully.")
+    logger.info("Database schema initialized")
 
 
 def insert_enquiry(data):
@@ -104,7 +136,6 @@ def insert_enquiry(data):
         """
         cur.execute(query, (full_name, email, phone, service, institution, domain, message, status))
         row = cur.fetchone()
-        conn.commit()
         enquiry_id = row[0]
         created_at = row[1].isoformat() if hasattr(row[1], 'isoformat') else str(row[1])
     else:
@@ -113,9 +144,11 @@ def insert_enquiry(data):
             VALUES (?, ?, ?, ?, ?, ?, ?, ?);
         """
         cur.execute(query, (full_name, email, phone, service, institution, domain, message, status))
-        conn.commit()
         enquiry_id = cur.lastrowid
         created_at = datetime.datetime.now().isoformat()
+
+    _insert_audit(cur, "public", "enquiry_created", enquiry_id)
+    conn.commit()
         
     cur.close()
     conn.close()
@@ -192,10 +225,13 @@ def update_enquiry_status(enquiry_id, status, notes=None):
             cur.execute("UPDATE enquiries SET status = ?, notes = ? WHERE id = ?", (status, notes, enquiry_id))
         else:
             cur.execute("UPDATE enquiries SET status = ? WHERE id = ?", (status, enquiry_id))
+    changed = cur.rowcount > 0
+    if changed:
+        _insert_audit(cur, "admin", "status_updated", enquiry_id, status)
     conn.commit()
     cur.close()
     conn.close()
-    return True
+    return changed
 
 
 def delete_enquiry(enquiry_id):
@@ -205,10 +241,51 @@ def delete_enquiry(enquiry_id):
         cur.execute("DELETE FROM enquiries WHERE id = %s", (enquiry_id,))
     else:
         cur.execute("DELETE FROM enquiries WHERE id = ?", (enquiry_id,))
+    deleted = cur.rowcount > 0
+    if deleted:
+        _insert_audit(cur, "admin", "enquiry_deleted", enquiry_id, None)
     conn.commit()
     cur.close()
     conn.close()
-    return True
+    return deleted
+
+
+def _insert_audit(cur, actor, action, enquiry_id=None, details=None):
+    if IS_POSTGRES:
+        cur.execute(
+            "INSERT INTO admin_audit_log (actor, action, enquiry_id, details) VALUES (%s, %s, %s, %s)",
+            (actor, action, enquiry_id, details),
+        )
+    else:
+        cur.execute(
+            "INSERT INTO admin_audit_log (actor, action, enquiry_id, details) VALUES (?, ?, ?, ?)",
+            (actor, action, enquiry_id, details),
+        )
+
+
+def record_audit_event(actor, action, enquiry_id=None, details=None):
+    conn = get_db()
+    cur = conn.cursor()
+    try:
+        _insert_audit(cur, actor, action, enquiry_id, details)
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        cur.close()
+        conn.close()
+
+
+def check_db():
+    conn = get_db()
+    cur = conn.cursor()
+    try:
+        cur.execute("SELECT 1")
+        return True
+    finally:
+        cur.close()
+        conn.close()
 
 
 def get_stats():
@@ -233,5 +310,5 @@ def get_stats():
         "new": new_leads,
         "contacted": contacted,
         "enrolled": enrolled,
-        "db_status": "Supabase PostgreSQL" if IS_POSTGRES else "Active Database (Ready for Supabase Pooler)"
+        "db_status": DB_STATUS
     }

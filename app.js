@@ -735,6 +735,59 @@ document.addEventListener('DOMContentLoaded', () => {
   function initEnquirySuite() {
     const modal = document.getElementById('enquiry-modal');
     const closeBtn = document.getElementById('enquiry-modal-close');
+    const enquiryForms = Array.from(document.querySelectorAll('.nevo-enquiry-form'));
+
+    function addHoneypot(form) {
+      if (form.querySelector('[name="website"]')) return;
+      const wrapper = document.createElement('div');
+      wrapper.setAttribute('aria-hidden', 'true');
+      wrapper.style.cssText = 'position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden;';
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.name = 'website';
+      input.tabIndex = -1;
+      input.autocomplete = 'off';
+      wrapper.appendChild(input);
+      form.appendChild(wrapper);
+    }
+
+    enquiryForms.forEach(addHoneypot);
+
+    fetch('/api/public-config')
+      .then(response => {
+        if (!response.ok) throw new Error('Could not load form configuration');
+        return response.json();
+      })
+      .then(async config => {
+        if (!config.turnstileSiteKey) return;
+        if (!window.turnstile) {
+          await new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+            script.async = true;
+            script.defer = true;
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+          });
+        }
+
+        enquiryForms.forEach(form => {
+          const container = document.createElement('div');
+          container.className = 'nevo-turnstile';
+          const submitBtn = form.querySelector('.btn-enquiry-submit');
+          form.insertBefore(container, submitBtn || null);
+          form.dataset.turnstileWidgetId = window.turnstile.render(container, {
+            sitekey: config.turnstileSiteKey,
+            callback: token => { form.dataset.turnstileToken = token; },
+            'expired-callback': () => { form.dataset.turnstileToken = ''; },
+            'error-callback': () => { form.dataset.turnstileToken = ''; }
+          });
+        });
+      })
+      .catch(error => {
+        console.warn('[NEVO] Form verification could not be initialized:', error);
+      });
 
     window.openEnquiryModal = function(serviceName) {
       if (!modal) return;
@@ -853,7 +906,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Wire up all .nevo-enquiry-form forms across all pages
-    document.querySelectorAll('.nevo-enquiry-form').forEach(form => {
+    enquiryForms.forEach(form => {
       form.addEventListener('submit', (e) => {
         e.preventDefault();
 
@@ -879,6 +932,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const domain = formData.get('domain') || '';
         const message = formData.get('message') || '';
 
+        if (form.dataset.turnstileWidgetId && !form.dataset.turnstileToken) {
+          showToast('Please complete the verification before submitting.');
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalHtml;
+          }
+          return;
+        }
+
         const payload = {
           fullName: fullName,
           email: email,
@@ -886,56 +948,65 @@ document.addEventListener('DOMContentLoaded', () => {
           service: service,
           institution: institution,
           domain: domain,
-          message: message
+          message: message,
+          website: formData.get('website') || '',
+          captchaToken: form.dataset.turnstileToken || ''
         };
 
-        // Send to Flask Backend API
         fetch('/api/enquiries', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         })
-        .then(res => res.json())
-        .then(data => {
-          console.log('[NEVO Backend] Enquiry saved to DB:', data);
-        })
-        .catch(err => {
-          console.warn('[NEVO Backend] API offline or static mode fallback:', err);
-        });
+        .then(async response => {
+          const data = await response.json().catch(() => ({}));
+          if (!response.ok || !data.success) {
+            throw new Error(data.error || 'Your enquiry could not be submitted. Please try again.');
+          }
 
-        // Also store in localStorage as client-side backup
-        try {
-          const stored = JSON.parse(localStorage.getItem('nevo_enquiries') || '[]');
-          stored.push({
-            ...payload,
-            timestamp: new Date().toISOString()
-          });
-          localStorage.setItem('nevo_enquiries', JSON.stringify(stored));
-        } catch (err) {
-          console.warn('Local storage backup error:', err);
-        }
-
-        setTimeout(() => {
           const parentCard = form.parentElement;
           const successDiv = document.createElement('div');
           successDiv.className = 'form-success-alert';
-          successDiv.innerHTML = `
-            <div class="form-success-icon">✓</div>
-            <h4>Thank You, ${fullName}!</h4>
-            <p>Your enquiry for <strong>${service}</strong> has been successfully received. Our academic coordinator will contact you at <strong>${email}</strong> with full curriculum briefs and scheduling.</p>
-            <button type="button" class="btn-enquiry-submit" style="max-width: 200px; margin-top: 1rem; padding: 0.6rem 1.2rem; font-size: 0.85rem;" onclick="this.parentElement.previousElementSibling.reset(); this.parentElement.previousElementSibling.style.display='flex'; this.parentElement.remove(); if (window.closeEnquiryModal) window.closeEnquiryModal();">
-              Submit Another Enquiry
-            </button>
-          `;
+          const icon = document.createElement('div');
+          icon.className = 'form-success-icon';
+          icon.textContent = '✓';
+          const heading = document.createElement('h4');
+          heading.textContent = `Thank You, ${fullName}!`;
+          const confirmation = document.createElement('p');
+          confirmation.textContent = `Your enquiry for ${service} has been received. Our team will contact you at ${email}.`;
+          const anotherButton = document.createElement('button');
+          anotherButton.type = 'button';
+          anotherButton.className = 'btn-enquiry-submit';
+          anotherButton.style.cssText = 'max-width:200px;margin-top:1rem;padding:0.6rem 1.2rem;font-size:0.85rem;';
+          anotherButton.textContent = 'Submit Another Enquiry';
+          successDiv.append(icon, heading, confirmation, anotherButton);
 
           form.style.display = 'none';
           parentCard.appendChild(successDiv);
-
+          anotherButton.addEventListener('click', () => {
+            form.reset();
+            form.style.display = '';
+            successDiv.remove();
+            form.dataset.turnstileToken = '';
+            if (form.dataset.turnstileWidgetId && window.turnstile) {
+              window.turnstile.reset(form.dataset.turnstileWidgetId);
+            }
+            if (window.closeEnquiryModal) window.closeEnquiryModal();
+          });
+        })
+        .catch(error => {
+          showToast(error.message || 'We could not submit your enquiry. Please try again.');
+          if (form.dataset.turnstileWidgetId && window.turnstile) {
+            window.turnstile.reset(form.dataset.turnstileWidgetId);
+            form.dataset.turnstileToken = '';
+          }
+        })
+        .finally(() => {
           if (submitBtn) {
             submitBtn.disabled = false;
             submitBtn.innerHTML = originalHtml;
           }
-        }, 600);
+        });
       });
     });
   }
