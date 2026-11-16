@@ -841,6 +841,17 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
+    // Direct Gmail Web Composer Opener
+    document.querySelectorAll('.social-icon-gmail, a[href*="nevotechsolutions@gmail.com"]').forEach(el => {
+      el.addEventListener('click', (e) => {
+        const targetUrl = el.getAttribute('href') || '';
+        if (targetUrl.startsWith('mailto:') || !targetUrl.includes('mail.google.com')) {
+          e.preventDefault();
+          window.open('https://mail.google.com/mail/?view=cm&fs=1&to=nevotechsolutions@gmail.com&su=Enquiry%20for%20NEVO%20TECH', '_blank', 'noopener,noreferrer');
+        }
+      });
+    });
+
     // Wire up all .nevo-enquiry-form forms across all pages
     document.querySelectorAll('.nevo-enquiry-form').forEach(form => {
       form.addEventListener('submit', (e) => {
