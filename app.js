@@ -1014,4 +1014,23 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize Enquiry Suite
   initEnquirySuite();
 
+  // Hidden admin access trigger (invisible to visitors: 5 quick clicks on footer copyright)
+  const footerCopyright = document.querySelector('.footer-bottom-bar > div:first-child');
+  if (footerCopyright) {
+    let adminClickCount = 0;
+    let adminClickTimer = null;
+    footerCopyright.addEventListener('click', () => {
+      adminClickCount += 1;
+      clearTimeout(adminClickTimer);
+      if (adminClickCount >= 5) {
+        adminClickCount = 0;
+        window.location.href = '/admin';
+        return;
+      }
+      adminClickTimer = setTimeout(() => {
+        adminClickCount = 0;
+      }, 2000);
+    });
+  }
+
 });
