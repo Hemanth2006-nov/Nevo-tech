@@ -146,12 +146,14 @@ The Flask service and Supabase database are separate services. A Render blueprin
    - `SECRET_KEY`: Generate with `python -c "import secrets; print(secrets.token_urlsafe(48))"`.
    - `ADMIN_PASSWORD_HASH`: Generate locally using `python -c "from getpass import getpass; from werkzeug.security import generate_password_hash; print(generate_password_hash(getpass()))"`. Store the hash, not the password.
    - `TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY`: Create a Cloudflare Turnstile widget for the production hostname. `TURNSTILE_REQUIRED=true` is set in the blueprint.
-   - Lead notifications: configure either SMTP (`SMTP_HOST`, `SMTP_FROM`, `NOTIFICATION_EMAIL_TO`, plus provider credentials as needed) or an HTTPS `LEAD_WEBHOOK_URL`.
-5. After deploy, test the site, a real enquiry, admin login, lead notification, CSV export, and `/health/ready`. Check Render logs for DB/SMTP/webhook errors.
+   - `LEAD_WEBHOOK_URL`: For a free Render service, configure an HTTPS webhook (for example, from Make or Zapier) that forwards new enquiry events to your email or CRM. Render free services block outbound SMTP ports, including Gmail SMTP port 587.
+5. After deploy, test the site, a real enquiry, admin login, lead notification, CSV export, and `/health/ready`. Check Render logs for DB/webhook errors.
 
 The blueprint runs a single Gunicorn worker so its default in-memory rate limiter is shared across request threads. Before adding workers or instances, provision Redis and set `RATELIMIT_STORAGE_URI` to its private Redis URL. Never expose a Redis URL publicly.
 
 For Railway, Fly.io, or a VPS, use the same environment variables and run `gunicorn server:app --workers 1 --threads 4 --timeout 30`. Set `TRUST_PROXY=true` only when requests pass through exactly one trusted reverse proxy.
+
+The Render blueprint explicitly selects the **Free** web-service plan. Free web services sleep after 15 minutes without traffic, may take about a minute to wake, have ephemeral local storage, and are not recommended by Render for production applications. Keep enquiry data in Supabase, not local SQLite. The app uses Supabase in production. For a live business where immediate responses and dependable availability matter, consider a paid web-service plan when affordable.
 
 ### Production safeguards and operations
 
