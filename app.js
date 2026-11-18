@@ -789,6 +789,11 @@ document.addEventListener('DOMContentLoaded', () => {
         console.warn('[NEVO] Form verification could not be initialized:', error);
       });
 
+    // Ensure Lenis never hijacks scroll inside any modal dialog
+    document.querySelectorAll('.enquiry-modal-backdrop, .enquiry-modal-dialog, .modal-overlay, .modal-dialog').forEach(el => {
+      el.setAttribute('data-lenis-prevent', '');
+    });
+
     window.openEnquiryModal = function(serviceName) {
       if (!modal) return;
 
@@ -818,8 +823,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
+      const dialog = modal.querySelector('.enquiry-modal-dialog');
+      if (dialog) dialog.scrollTop = 0;
       modal.classList.add('active');
+      modal.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
+      if (window.lenis) window.lenis.stop();
     };
 
     window.selectHomeService = function(serviceName) {
@@ -860,7 +869,9 @@ document.addEventListener('DOMContentLoaded', () => {
     window.closeEnquiryModal = function() {
       if (!modal) return;
       modal.classList.remove('active');
+      modal.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = '';
+      if (window.lenis) window.lenis.start();
     };
 
     if (closeBtn) {

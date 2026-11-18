@@ -3423,13 +3423,35 @@ html.lenis, html.lenis body {
   border-radius: var(--radius-lg);
   width: 100%;
   max-width: 640px;
-  max-height: 92vh;
+  max-height: 90vh;
   overflow-y: auto;
-  padding: 2.25rem 2.5rem;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(56, 189, 248, 0.45) rgba(11, 19, 35, 0.8);
+  padding: 2rem 2.25rem;
   position: relative;
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75), 0 0 40px rgba(56, 189, 248, 0.15);
   transform: scale(0.94) translateY(18px);
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.enquiry-modal-dialog::-webkit-scrollbar {
+  width: 6px;
+}
+
+.enquiry-modal-dialog::-webkit-scrollbar-track {
+  background: rgba(11, 19, 35, 0.8);
+  border-radius: 6px;
+}
+
+.enquiry-modal-dialog::-webkit-scrollbar-thumb {
+  background: rgba(56, 189, 248, 0.45);
+  border-radius: 6px;
+}
+
+.enquiry-modal-dialog::-webkit-scrollbar-thumb:hover {
+  background: rgba(56, 189, 248, 0.75);
 }
 
 .enquiry-modal-backdrop.active .enquiry-modal-dialog {
