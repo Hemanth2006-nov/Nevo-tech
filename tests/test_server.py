@@ -6,8 +6,9 @@ import server
 
 
 @pytest.fixture
-def client():
+def client(monkeypatch):
     server.app.config.update(TESTING=True)
+    monkeypatch.setattr(server, "_verify_turnstile", lambda _token: True)
     return server.app.test_client()
 
 
@@ -93,6 +94,7 @@ def test_database_failure_does_not_return_success(client, monkeypatch):
 def test_new_enquiry_is_recorded_in_audit_log(tmp_path, monkeypatch):
     database_path = tmp_path / "audit-test.db"
     monkeypatch.setattr(server.db, "SQLITE_PATH", str(database_path))
+    monkeypatch.setattr(server.db, "IS_POSTGRES", False)
     server.db.init_db()
     server.db.insert_enquiry(valid_enquiry())
 
@@ -127,6 +129,42 @@ def test_admin_login_reports_missing_local_configuration(client, monkeypatch):
 
     assert response.status_code == 503
     assert b"Admin login is not configured" in response.data
+
+
+def test_admin_login_requires_the_configured_username_and_password(client, monkeypatch):
+    monkeypatch.setattr(server, "ADMIN_AUTH_CONFIGURED", True)
+    monkeypatch.setattr(server, "ADMIN_USERNAME", "nevo-admin")
+    monkeypatch.setattr(
+        server,
+        "_admin_password_matches",
+        lambda candidate: candidate == "strong-test-password",
+    )
+    monkeypatch.setattr(server.db, "record_audit_event", lambda *_args: None)
+    with client.session_transaction() as current_session:
+        current_session["_csrf_token"] = "test-csrf-token"
+
+    rejected = client.post(
+        "/admin/login",
+        data={
+            "csrf_token": "test-csrf-token",
+            "username": "wrong-user",
+            "password": "strong-test-password",
+        },
+    )
+    accepted = client.post(
+        "/admin/login",
+        data={
+            "csrf_token": "test-csrf-token",
+            "username": "nevo-admin",
+            "password": "strong-test-password",
+        },
+    )
+
+    assert rejected.status_code == 200
+    assert b"Invalid administrator username or password" in rejected.data
+    assert accepted.status_code == 302
+    with client.session_transaction() as current_session:
+        assert current_session["is_admin"] is True
 
 
 def test_csv_export_requires_csrf_token(client, monkeypatch):

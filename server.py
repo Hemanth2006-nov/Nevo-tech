@@ -35,9 +35,10 @@ import db
 APP_ENV = os.environ.get("APP_ENV", "development").lower()
 IS_PRODUCTION = APP_ENV == "production"
 SECRET_KEY = os.environ.get("SECRET_KEY")
+ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME", "").strip() or "admin"
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD")
 ADMIN_PASSWORD_HASH = os.environ.get("ADMIN_PASSWORD_HASH")
-ADMIN_AUTH_CONFIGURED = bool(ADMIN_PASSWORD or ADMIN_PASSWORD_HASH)
+ADMIN_AUTH_CONFIGURED = bool(ADMIN_USERNAME and (ADMIN_PASSWORD or ADMIN_PASSWORD_HASH))
 TURNSTILE_SITE_KEY = os.environ.get("TURNSTILE_SITE_KEY", "").strip()
 TURNSTILE_SECRET_KEY = os.environ.get("TURNSTILE_SECRET_KEY", "").strip()
 TURNSTILE_REQUIRED = os.environ.get("TURNSTILE_REQUIRED", "false").lower() in {"1", "true", "yes"}
@@ -396,7 +397,7 @@ def admin_login():
     if not ADMIN_AUTH_CONFIGURED:
         return render_template(
             "admin_login.html",
-            error="Admin login is not configured. Set ADMIN_PASSWORD locally before signing in.",
+            error="Admin login is not configured. Set ADMIN_USERNAME and an admin password locally before signing in.",
             csrf_token=_csrf_token(),
             login_enabled=False,
         ), 503
@@ -408,15 +409,19 @@ def admin_login():
                 csrf_token=_csrf_token(),
                 login_enabled=True,
             ), 400
+        username = request.form.get("username", "").strip()
         password = request.form.get("password", "")
-        if _admin_password_matches(password):
+        if (
+            hmac.compare_digest(username.encode("utf-8"), ADMIN_USERNAME.encode("utf-8"))
+            and _admin_password_matches(password)
+        ):
             session.clear()
             session["is_admin"] = True
             session.permanent = True
             _csrf_token()
-            db.record_audit_event("admin", "login_success")
+            db.record_audit_event(ADMIN_USERNAME, "login_success")
             return redirect(url_for("admin_dashboard"))
-        error = "Invalid administrator password. Please try again."
+        error = "Invalid administrator username or password. Please try again."
 
     return render_template(
         "admin_login.html",

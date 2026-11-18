@@ -26,6 +26,7 @@ APP_ENV=development
 DATABASE_URL=your-supabase-postgresql-connection-string?sslmode=require
 PORT=5000
 SECRET_KEY=generate-a-unique-random-value
+ADMIN_USERNAME=nevo-admin
 ADMIN_PASSWORD=use-a-unique-local-admin-password
 ```
 
@@ -45,7 +46,7 @@ The Admin Dashboard provides real-time oversight of all student and corporate in
 
 | Access Point | URL | Credentials / Notes |
 | :--- | :--- | :--- |
-| **Admin Portal** | [http://localhost:5000/admin](http://localhost:5000/admin) | Use the locally configured admin password |
+| **Admin Portal** | [http://localhost:5000/admin](http://localhost:5000/admin) | Use the configured admin username and password |
 | **Admin Login** | [http://localhost:5000/admin/login](http://localhost:5000/admin/login) | Protected Session Authentication |
 | **CSV Export** | Admin dashboard | CSRF-protected one-click lead export for CRM |
 | **Public Site** | [http://localhost:5000/](http://localhost:5000/) | Live website with enquiry forms |
@@ -144,6 +145,7 @@ The Flask service and Supabase database are separate services. A Render blueprin
 4. Configure the required environment variables in Render:
    - `DATABASE_URL`: Rotated Supabase PostgreSQL connection string with `sslmode=require`.
    - `SECRET_KEY`: Generate with `python -c "import secrets; print(secrets.token_urlsafe(48))"`.
+   - `ADMIN_USERNAME`: Choose the admin login ID (for example, `nevo-admin`).
    - `ADMIN_PASSWORD_HASH`: Generate locally using `python -c "from getpass import getpass; from werkzeug.security import generate_password_hash; print(generate_password_hash(getpass()))"`. Store the hash, not the password.
    - `TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY`: Create a Cloudflare Turnstile widget for the production hostname. `TURNSTILE_REQUIRED=true` is set in the blueprint.
    - `LEAD_WEBHOOK_URL`: For a free Render service, configure an HTTPS webhook (for example, from Make or Zapier) that forwards new enquiry events to your email or CRM. Render free services block outbound SMTP ports, including Gmail SMTP port 587.
