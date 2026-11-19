@@ -403,18 +403,57 @@ def create_enquiry_by_admin(data):
     }
 
 
-def get_all_enquiries(service_filter=None, status_filter=None, search=None):
+def get_all_enquiries(service_filter=None, status_filter=None, search=None, category=None, track=None):
     conn = get_db()
     enquiries = []
     
+    # Handle composite service_filter values if category/track not explicitly passed
+    if service_filter:
+        sf = service_filter.lower().strip()
+        if sf == 'internship':
+            category = 'internship'
+        elif sf in ('projects', 'project'):
+            category = 'projects'
+        elif sf == 'tech':
+            track = 'tech'
+        elif sf in ('nontech', 'non-tech'):
+            track = 'nontech'
+        elif sf in ('internship_tech', 'internship-tech'):
+            category = 'internship'
+            track = 'tech'
+        elif sf in ('internship_nontech', 'internship-nontech'):
+            category = 'internship'
+            track = 'nontech'
+        elif sf in ('projects_tech', 'projects-tech'):
+            category = 'projects'
+            track = 'tech'
+        elif sf in ('projects_nontech', 'projects-nontech'):
+            category = 'projects'
+            track = 'nontech'
+        else:
+            # exact service string filter
+            pass
+
     if IS_POSTGRES:
         cur = conn.cursor(cursor_factory=RealDictCursor)
         query = "SELECT * FROM enquiries WHERE 1=1"
         params = []
         
-        if service_filter:
+        if category == 'internship':
+            query += " AND service ILIKE '%Internship%'"
+        elif category == 'projects':
+            query += " AND (service ILIKE '%Project%' OR service ILIKE '%Research%' OR service ILIKE '%Partnership%')"
+
+        if track == 'tech':
+            query += " AND service ILIKE '%Technical%'"
+        elif track == 'nontech':
+            query += " AND service NOT ILIKE '%Technical%'"
+
+        # If an explicit service string that wasn't category/track shorthand
+        if service_filter and not category and not track:
             query += " AND service = %s"
             params.append(service_filter)
+
         if status_filter:
             query += " AND status = %s"
             params.append(status_filter)
@@ -437,9 +476,20 @@ def get_all_enquiries(service_filter=None, status_filter=None, search=None):
         query = "SELECT * FROM enquiries WHERE 1=1"
         params = []
         
-        if service_filter:
+        if category == 'internship':
+            query += " AND service LIKE '%Internship%'"
+        elif category == 'projects':
+            query += " AND (service LIKE '%Project%' OR service LIKE '%Research%' OR service LIKE '%Partnership%')"
+
+        if track == 'tech':
+            query += " AND service LIKE '%Technical%'"
+        elif track == 'nontech':
+            query += " AND service NOT LIKE '%Technical%'"
+
+        if service_filter and not category and not track:
             query += " AND service = ?"
             params.append(service_filter)
+
         if status_filter:
             query += " AND status = ?"
             params.append(status_filter)
@@ -940,6 +990,24 @@ def get_stats():
 
     cur.execute("SELECT COUNT(*) FROM website_items;")
     website_items_total = cur.fetchone()[0]
+
+    # Two Options (Internship & Projects) with Tech & Non-Tech counts
+    cur.execute("SELECT COUNT(*) FROM enquiries WHERE service LIKE '%Technical Internship%';")
+    internship_tech = cur.fetchone()[0]
+
+    cur.execute("SELECT COUNT(*) FROM enquiries WHERE service LIKE '%Business & Analytics%';")
+    internship_nontech = cur.fetchone()[0]
+
+    cur.execute("SELECT COUNT(*) FROM enquiries WHERE service LIKE '%Customized Technical Project%';")
+    projects_tech = cur.fetchone()[0]
+
+    cur.execute("SELECT COUNT(*) FROM enquiries WHERE service LIKE '%Survey-Based%';")
+    projects_nontech = cur.fetchone()[0]
+
+    internship_total = internship_tech + internship_nontech
+    projects_total = projects_tech + projects_nontech
+    tech_total = internship_tech + projects_tech
+    nontech_total = internship_nontech + projects_nontech
     
     cur.close()
     conn.close()
@@ -950,5 +1018,13 @@ def get_stats():
         "enrolled": enrolled,
         "team_total": team_total,
         "website_items_total": website_items_total,
+        "internship_total": internship_total,
+        "projects_total": projects_total,
+        "internship_tech": internship_tech,
+        "internship_nontech": internship_nontech,
+        "projects_tech": projects_tech,
+        "projects_nontech": projects_nontech,
+        "tech_total": tech_total,
+        "nontech_total": nontech_total,
         "db_status": DB_STATUS
     }

@@ -202,3 +202,91 @@ def test_admin_dashboard_renders_with_tabs_and_data(logged_in_admin):
     assert b"Website Content &amp; Photos" in res.data
     assert b"Modify Enquired Person" in res.data
     assert b"Add Inquired Person" in res.data
+    # Check two options: Internship and Projects
+    assert b"category-filter" in res.data
+    assert b"track-filter" in res.data
+    assert b"edit-lead-category" in res.data
+    assert b"edit-lead-track" in res.data
+    assert b"add-lead-category" in res.data
+    assert b"add-lead-track" in res.data
+    assert b"Quick Find:" in res.data
+
+
+def test_category_and_track_filters(logged_in_admin):
+    # 1. Add sample leads across the 4 combinations:
+    # 1a. Internship Tech
+    logged_in_admin.post(
+        "/api/admin/enquiries",
+        json={
+            "fullName": "Student Intern Tech",
+            "email": "intern.tech@example.com",
+            "phone": "+91 99999 11111",
+            "service": "Technical Internship Programs",
+            "institution": "Tech Institute",
+            "domain": "AI",
+            "status": "New"
+        },
+        headers={"X-CSRFToken": "valid-csrf-token"}
+    )
+    # 1b. Internship Non-Tech
+    logged_in_admin.post(
+        "/api/admin/enquiries",
+        json={
+            "fullName": "Student Intern NonTech",
+            "email": "intern.nontech@example.com",
+            "phone": "+91 99999 22222",
+            "service": "Business & Analytics Internship",
+            "institution": "Business School",
+            "domain": "Analytics",
+            "status": "New"
+        },
+        headers={"X-CSRFToken": "valid-csrf-token"}
+    )
+    # 1c. Projects Tech
+    logged_in_admin.post(
+        "/api/admin/enquiries",
+        json={
+            "fullName": "Student Project Tech",
+            "email": "project.tech@example.com",
+            "phone": "+91 99999 33333",
+            "service": "Customized Technical Projects & Documentation",
+            "institution": "Engineering College",
+            "domain": "IoT",
+            "status": "New"
+        },
+        headers={"X-CSRFToken": "valid-csrf-token"}
+    )
+    # 1d. Projects Non-Tech
+    logged_in_admin.post(
+        "/api/admin/enquiries",
+        json={
+            "fullName": "Student Project NonTech",
+            "email": "project.nontech@example.com",
+            "phone": "+91 99999 44444",
+            "service": "Survey-Based Projects & Research Reports",
+            "institution": "Research University",
+            "domain": "Economics",
+            "status": "New"
+        },
+        headers={"X-CSRFToken": "valid-csrf-token"}
+    )
+
+    # 2. Test filtering via /api/enquiries
+    res_intern_tech = logged_in_admin.get("/api/enquiries?category=internship&track=tech")
+    assert res_intern_tech.status_code == 200
+    emails_it = [x["email"] for x in res_intern_tech.get_json()["enquiries"]]
+    assert "intern.tech@example.com" in emails_it
+    assert "intern.nontech@example.com" not in emails_it
+    assert "project.tech@example.com" not in emails_it
+
+    res_proj_nontech = logged_in_admin.get("/api/enquiries?category=projects&track=nontech")
+    assert res_proj_nontech.status_code == 200
+    emails_pn = [x["email"] for x in res_proj_nontech.get_json()["enquiries"]]
+    assert "project.nontech@example.com" in emails_pn
+    assert "project.tech@example.com" not in emails_pn
+    assert "intern.tech@example.com" not in emails_pn
+
+    # 3. Test admin dashboard render with category & track filter
+    dash_res = logged_in_admin.get("/admin/dashboard?category=internship&track=tech")
+    assert dash_res.status_code == 200
+    assert b"intern.tech@example.com" in dash_res.data

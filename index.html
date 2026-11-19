@@ -66,8 +66,15 @@
         const status = document.getElementById('preloader-status');
         if (!preloader) return;
 
-        if (window.location.search.includes('skip-intro')) {
+        // If user already saw the preloader in this session, or if navigating with a hash or back, don't show it again!
+        let hasSeenPreloader = false;
+        try {
+          hasSeenPreloader = !!sessionStorage.getItem('nevo_preloader_seen');
+        } catch(e) {}
+
+        if (hasSeenPreloader || window.location.hash || window.location.search.includes('skip-intro')) {
           preloader.style.display = 'none';
+          preloader.classList.add('loaded');
           document.body.classList.remove('preloader-active');
           return;
         }
@@ -110,7 +117,9 @@
           } else {
             setTimeout(function() {
               preloader.classList.add('loaded');
+              preloader.style.display = 'none';
               document.body.classList.remove('preloader-active');
+              try { sessionStorage.setItem('nevo_preloader_seen', 'true'); } catch(e){}
               if (window.playSfx) window.playSfx('success');
             }, 350);
           }
@@ -118,8 +127,23 @@
 
         requestAnimationFrame(runPreloaderStep);
 
+        // Handle BFCache (back/forward navigation)
+        window.addEventListener('pageshow', function(event) {
+          try {
+            if (event.persisted || sessionStorage.getItem('nevo_preloader_seen')) {
+              const p = document.getElementById('nevo-preloader');
+              if (p) {
+                p.style.display = 'none';
+                p.classList.add('loaded');
+              }
+              document.body.classList.remove('preloader-active');
+            }
+          } catch(e) {}
+        });
+
         window.replayIntro = function() {
           if (!preloader) return;
+          preloader.style.display = '';
           preloader.classList.remove('loaded');
           document.body.classList.add('preloader-active');
           if (bar) bar.style.width = '0%';

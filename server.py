@@ -395,9 +395,11 @@ def list_enquiries():
     if not session.get("is_admin"):
         return jsonify({"success": False, "error": "Unauthorized"}), 401
     enquiries = db.get_all_enquiries(
-        request.args.get("service"),
-        request.args.get("status"),
-        request.args.get("search"),
+        service_filter=request.args.get("service"),
+        status_filter=request.args.get("status"),
+        search=request.args.get("search"),
+        category=request.args.get("category"),
+        track=request.args.get("track"),
     )
     return jsonify({"success": True, "enquiries": enquiries})
 
@@ -756,15 +758,19 @@ def admin_dashboard():
     if not session.get("is_admin"):
         return redirect(url_for("admin_login"))
     service_filter = request.args.get("service")
+    category_filter = request.args.get("category")
+    track_filter = request.args.get("track")
     status_filter = request.args.get("status")
     search = request.args.get("search")
     return render_template(
         "admin.html",
-        enquiries=db.get_all_enquiries(service_filter, status_filter, search),
+        enquiries=db.get_all_enquiries(service_filter, status_filter, search, category=category_filter, track=track_filter),
         team_members=db.get_all_team_members(),
         website_items=db.get_all_website_items(),
         stats=db.get_stats(),
         service_filter=service_filter,
+        category_filter=category_filter,
+        track_filter=track_filter,
         status_filter=status_filter,
         search=search,
         csrf_token=_csrf_token(),

@@ -424,6 +424,125 @@
       color: var(--text-muted);
       margin-top: 3px;
     }
+    /* Dual Classification Badges: Category (Internship vs Projects) & Track (Tech vs Non-Tech) */
+    .track-badge-container {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .track-badge-pills {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+    .badge-cat {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .badge-cat-internship {
+      background: rgba(16, 185, 129, 0.16);
+      border: 1px solid rgba(16, 185, 129, 0.45);
+      color: #34d399;
+    }
+    .badge-cat-projects {
+      background: rgba(168, 85, 247, 0.16);
+      border: 1px solid rgba(168, 85, 247, 0.45);
+      color: #c084fc;
+    }
+    .badge-track {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .badge-track-tech {
+      background: rgba(56, 189, 248, 0.16);
+      border: 1px solid rgba(56, 189, 248, 0.45);
+      color: #38bdf8;
+    }
+    .badge-track-nontech {
+      background: rgba(245, 158, 11, 0.16);
+      border: 1px solid rgba(245, 158, 11, 0.45);
+      color: #fbbf24;
+    }
+    .track-sub-label {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      line-height: 1.25;
+    }
+
+    /* Quick Filter Pills Bar */
+    .quick-filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.15rem;
+      padding: 0.35rem 0.25rem;
+    }
+    .quick-filter-label {
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-right: 0.25rem;
+    }
+    .quick-pill-btn {
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text-muted);
+      padding: 5px 12px;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .quick-pill-btn:hover {
+      background: rgba(56, 189, 248, 0.12);
+      border-color: var(--cyan);
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+    .quick-pill-btn.active {
+      background: var(--cyan);
+      border-color: var(--cyan);
+      color: #050811;
+      box-shadow: 0 0 14px rgba(56, 189, 248, 0.4);
+    }
+    .quick-pill-count {
+      font-size: 0.7rem;
+      padding: 1px 6px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.15);
+      color: inherit;
+    }
+    .quick-pill-btn.active .quick-pill-count {
+      background: rgba(0, 0, 0, 0.25);
+      color: #050811;
+    }
+
     .service-badge {
       display: inline-block;
       padding: 4px 10px;
@@ -990,31 +1109,37 @@
   <!-- Main Container -->
   <main class="admin-container">
 
-    <!-- KPI Metric Cards (6 metrics) -->
+    <!-- KPI Metric Cards (6 metrics with Internship & Projects, Tech & Non-Tech breakdown) -->
     <div class="metrics-grid">
       <div class="metric-card card-total">
         <span class="metric-label">Total Inquiries</span>
         <span class="metric-val" id="metric-total">{{ stats.total }}</span>
+        <span style="font-size: 0.74rem; color: var(--text-muted);">Tech: {{ stats.tech_total }} · Non-Tech: {{ stats.nontech_total }}</span>
+      </div>
+      <div class="metric-card card-enrolled">
+        <span class="metric-label">🎓 Internships</span>
+        <span class="metric-val" id="metric-internship">{{ stats.internship_total }}</span>
+        <span style="font-size: 0.74rem; color: #4ade80;">💻 Tech: {{ stats.internship_tech }} · 📊 Non-Tech: {{ stats.internship_nontech }}</span>
+      </div>
+      <div class="metric-card card-team">
+        <span class="metric-label">📁 Projects</span>
+        <span class="metric-val" id="metric-projects">{{ stats.projects_total }}</span>
+        <span style="font-size: 0.74rem; color: #c084fc;">💻 Tech: {{ stats.projects_tech }} · 📊 Non-Tech: {{ stats.projects_nontech }}</span>
       </div>
       <div class="metric-card card-new">
         <span class="metric-label">New Leads</span>
         <span class="metric-val" id="metric-new">{{ stats.new }}</span>
+        <span style="font-size: 0.74rem; color: var(--amber);">Awaiting outreach</span>
       </div>
       <div class="metric-card card-contacted">
         <span class="metric-label">In Progress</span>
         <span class="metric-val" id="metric-contacted">{{ stats.contacted }}</span>
-      </div>
-      <div class="metric-card card-enrolled">
-        <span class="metric-label">Enrolled / Converted</span>
-        <span class="metric-val" id="metric-enrolled">{{ stats.enrolled }}</span>
-      </div>
-      <div class="metric-card card-team">
-        <span class="metric-label">Team Members</span>
-        <span class="metric-val" id="metric-team">{{ stats.team_total or (team_members|length) }}</span>
+        <span style="font-size: 0.74rem; color: #38bdf8;">In Review &amp; Active</span>
       </div>
       <div class="metric-card card-website">
-        <span class="metric-label">Showcase & Photos</span>
-        <span class="metric-val" id="metric-website">{{ stats.website_items_total or (website_items|length) }}</span>
+        <span class="metric-label">Enrolled / Converted</span>
+        <span class="metric-val" id="metric-enrolled">{{ stats.enrolled }}</span>
+        <span style="font-size: 0.74rem; color: #4ade80;">Active students</span>
       </div>
     </div>
 
@@ -1040,17 +1165,23 @@
          =================================================================== -->
     <div id="tab-enquiries" class="tab-pane active">
 
-      <!-- Toolbar -->
+      <!-- Toolbar: Two Options (Internship & Projects) with Tech & Non-Tech -->
       <div class="toolbar-card">
         <div class="filter-group">
-          <input type="text" id="search-input" class="toolbar-input" placeholder="🔍 Search by name, email, college, or domain..." value="{{ search or '' }}">
+          <input type="text" id="search-input" class="toolbar-input" placeholder="🔍 Search by name, email, college, domain..." value="{{ search or '' }}">
 
-          <select id="service-filter" class="toolbar-select">
-            <option value="">All Services</option>
-            <option value="Technical Internship Programs" {% if service_filter == 'Technical Internship Programs' %}selected{% endif %}>Technical Internships</option>
-            <option value="Business & Analytics Internship" {% if service_filter == 'Business & Analytics Internship' %}selected{% endif %}>Business &amp; Analytics</option>
-            <option value="Customized Technical Projects & Documentation" {% if service_filter == 'Customized Technical Projects & Documentation' %}selected{% endif %}>Custom Projects</option>
-            <option value="Survey-Based Projects & Research Reports" {% if service_filter == 'Survey-Based Projects & Research Reports' %}selected{% endif %}>Survey &amp; Research</option>
+          <!-- OPTION 1: Internship vs Projects -->
+          <select id="category-filter" class="toolbar-select">
+            <option value="">All Services (Internship &amp; Projects)</option>
+            <option value="internship" {% if category_filter == 'internship' %}selected{% endif %}>🎓 Internship</option>
+            <option value="projects" {% if category_filter == 'projects' %}selected{% endif %}>📁 Projects</option>
+          </select>
+
+          <!-- OPTION 2: Tech vs Non-Tech -->
+          <select id="track-filter" class="toolbar-select">
+            <option value="">All Tracks (Tech &amp; Non-Tech)</option>
+            <option value="tech" {% if track_filter == 'tech' %}selected{% endif %}>💻 Tech</option>
+            <option value="nontech" {% if track_filter == 'nontech' %}selected{% endif %}>📊 Non-Tech</option>
           </select>
 
           <select id="status-filter" class="toolbar-select">
@@ -1079,6 +1210,31 @@
         </div>
       </div>
 
+      <!-- Quick Filter Pills: Find Tech & Non-Tech for Internship & Projects with 1-click -->
+      <div class="quick-filter-bar">
+        <span class="quick-filter-label">Quick Find:</span>
+        <button type="button" class="quick-pill-btn {{ 'active' if not category_filter and not track_filter else '' }}" onclick="setQuickFilter('', '')">
+          <span>All Leads</span>
+          <span class="quick-pill-count">{{ stats.total }}</span>
+        </button>
+        <button type="button" class="quick-pill-btn {{ 'active' if category_filter == 'internship' and track_filter == 'tech' else '' }}" onclick="setQuickFilter('internship', 'tech')">
+          <span>🎓 Internship · 💻 Tech</span>
+          <span class="quick-pill-count">{{ stats.internship_tech }}</span>
+        </button>
+        <button type="button" class="quick-pill-btn {{ 'active' if category_filter == 'internship' and track_filter == 'nontech' else '' }}" onclick="setQuickFilter('internship', 'nontech')">
+          <span>🎓 Internship · 📊 Non-Tech</span>
+          <span class="quick-pill-count">{{ stats.internship_nontech }}</span>
+        </button>
+        <button type="button" class="quick-pill-btn {{ 'active' if category_filter == 'projects' and track_filter == 'tech' else '' }}" onclick="setQuickFilter('projects', 'tech')">
+          <span>📁 Projects · 💻 Tech</span>
+          <span class="quick-pill-count">{{ stats.projects_tech }}</span>
+        </button>
+        <button type="button" class="quick-pill-btn {{ 'active' if category_filter == 'projects' and track_filter == 'nontech' else '' }}" onclick="setQuickFilter('projects', 'nontech')">
+          <span>📁 Projects · 📊 Non-Tech</span>
+          <span class="quick-pill-count">{{ stats.projects_nontech }}</span>
+        </button>
+      </div>
+
       <!-- Leads Table -->
       <div class="table-card">
         <div class="table-responsive">
@@ -1088,7 +1244,7 @@
                 <th>#ID</th>
                 <th>Applicant</th>
                 <th>Contact Details</th>
-                <th>Program Track</th>
+                <th>Service Option &amp; Track</th>
                 <th>Institution / Domain</th>
                 <th>Status</th>
                 <th style="text-align: right;">Actions</th>
@@ -1108,15 +1264,24 @@
                     <a href="tel:{{ item.phone }}" id="lead-phone-{{ item.id }}" class="contact-phone" title="Call or WhatsApp">📞 {{ item.phone }}</a>
                   </td>
                   <td id="lead-service-{{ item.id }}">
-                    {% if 'Technical' in item.service %}
-                      <span class="service-badge badge-tech">{{ item.service }}</span>
-                    {% elif 'Business' in item.service %}
-                      <span class="service-badge badge-biz">{{ item.service }}</span>
-                    {% elif 'Customized' in item.service %}
-                      <span class="service-badge badge-proj">{{ item.service }}</span>
-                    {% else %}
-                      <span class="service-badge badge-survey">{{ item.service }}</span>
-                    {% endif %}
+                    {% set is_internship = 'internship' in item.service|lower %}
+                    {% set is_tech = 'technical' in item.service|lower %}
+                    <div class="track-badge-container">
+                      <div class="track-badge-pills">
+                        {% if is_internship %}
+                          <span class="badge-cat badge-cat-internship">🎓 INTERNSHIP</span>
+                        {% else %}
+                          <span class="badge-cat badge-cat-projects">📁 PROJECTS</span>
+                        {% endif %}
+
+                        {% if is_tech %}
+                          <span class="badge-track badge-track-tech">💻 TECH</span>
+                        {% else %}
+                          <span class="badge-track badge-track-nontech">📊 NON-TECH</span>
+                        {% endif %}
+                      </div>
+                      <div class="track-sub-label">{{ item.service }}</div>
+                    </div>
                   </td>
                   <td>
                     <div style="font-weight: 600; color: #ffffff;" id="lead-institution-{{ item.id }}">{{ item.institution or '—' }}</div>
@@ -1146,7 +1311,7 @@
                   <td colspan="7" style="text-align: center; padding: 3.5rem; color: var(--text-muted);">
                     <div style="font-size: 2rem; margin-bottom: 0.5rem;">📥</div>
                     <div style="font-size: 1.1rem; color: #ffffff; font-weight: 700;">No Inquiries Found</div>
-                    <div style="font-size: 0.85rem; margin-top: 0.25rem;">Submissions from website forms or directly added leads will appear here in real-time.</div>
+                    <div style="font-size: 0.85rem; margin-top: 0.25rem;">No leads match the selected Internship / Projects and Tech / Non-Tech filters.</div>
                   </td>
                 </tr>
               {% endif %}
@@ -1353,26 +1518,45 @@
             <input type="tel" id="edit-lead-phone" class="form-input" required maxlength="30">
           </div>
           <div class="form-field">
-            <label class="form-label">Program Track *</label>
-            <select id="edit-lead-service" class="form-select" required>
-              <option value="Technical Internship Programs">Technical Internship Programs</option>
-              <option value="Business & Analytics Internship">Business &amp; Analytics Internship</option>
-              <option value="Customized Technical Projects & Documentation">Customized Technical Projects &amp; Documentation</option>
-              <option value="Survey-Based Projects & Research Reports">Survey-Based Projects &amp; Research Reports</option>
-              <option value="General Academic Partnership">General Academic Partnership</option>
+            <label class="form-label">College / Institution</label>
+            <input type="text" id="edit-lead-institution" class="form-input" maxlength="160">
+          </div>
+
+          <div class="form-field">
+            <label class="form-label">Service Option (2 Options) *</label>
+            <select id="edit-lead-category" class="form-select" onchange="syncServiceSelect('edit')">
+              <option value="internship">🎓 Internship</option>
+              <option value="projects">📁 Projects</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label class="form-label">Track Type *</label>
+            <select id="edit-lead-track" class="form-select" onchange="syncServiceSelect('edit')">
+              <option value="tech">💻 Tech</option>
+              <option value="nontech">📊 Non-Tech</option>
+            </select>
+          </div>
+
+          <div class="form-field form-col-full">
+            <label class="form-label">Program Track Detail *</label>
+            <select id="edit-lead-service" class="form-select" required onchange="syncCategoryTrackFromService('edit')">
+              <optgroup label="🎓 INTERNSHIP">
+                <option value="Technical Internship Programs">Technical Internship Programs (Tech)</option>
+                <option value="Business & Analytics Internship">Business &amp; Analytics Internship (Non-Tech)</option>
+              </optgroup>
+              <optgroup label="📁 PROJECTS">
+                <option value="Customized Technical Projects & Documentation">Customized Technical Projects &amp; Documentation (Tech)</option>
+                <option value="Survey-Based Projects & Research Reports">Survey-Based Projects &amp; Research Reports (Non-Tech)</option>
+                <option value="General Academic Partnership">General Academic Partnership (Academic / Non-Tech)</option>
+              </optgroup>
             </select>
           </div>
 
           <div class="form-field">
-            <label class="form-label">College / Institution</label>
-            <input type="text" id="edit-lead-institution" class="form-input" maxlength="160">
-          </div>
-          <div class="form-field">
             <label class="form-label">Specialization / Domain</label>
             <input type="text" id="edit-lead-domain" class="form-input" maxlength="160">
           </div>
-
-          <div class="form-field form-col-full">
+          <div class="form-field">
             <label class="form-label">Lead Status</label>
             <select id="edit-lead-status" class="form-select">
               <option value="New">New</option>
@@ -1433,26 +1617,45 @@
             <input type="tel" id="add-lead-phone" class="form-input" required placeholder="+91 98765 43210" maxlength="30">
           </div>
           <div class="form-field">
-            <label class="form-label">Program Track *</label>
-            <select id="add-lead-service" class="form-select" required>
-              <option value="Technical Internship Programs">Technical Internship Programs</option>
-              <option value="Business & Analytics Internship">Business &amp; Analytics Internship</option>
-              <option value="Customized Technical Projects & Documentation">Customized Technical Projects &amp; Documentation</option>
-              <option value="Survey-Based Projects & Research Reports">Survey-Based Projects &amp; Research Reports</option>
-              <option value="General Academic Partnership">General Academic Partnership</option>
+            <label class="form-label">College / Institution</label>
+            <input type="text" id="add-lead-institution" class="form-input" placeholder="e.g. RV College of Engineering" maxlength="160">
+          </div>
+
+          <div class="form-field">
+            <label class="form-label">Service Option (2 Options) *</label>
+            <select id="add-lead-category" class="form-select" onchange="syncServiceSelect('add')">
+              <option value="internship">🎓 Internship</option>
+              <option value="projects">📁 Projects</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label class="form-label">Track Type *</label>
+            <select id="add-lead-track" class="form-select" onchange="syncServiceSelect('add')">
+              <option value="tech">💻 Tech</option>
+              <option value="nontech">📊 Non-Tech</option>
+            </select>
+          </div>
+
+          <div class="form-field form-col-full">
+            <label class="form-label">Program Track Detail *</label>
+            <select id="add-lead-service" class="form-select" required onchange="syncCategoryTrackFromService('add')">
+              <optgroup label="🎓 INTERNSHIP">
+                <option value="Technical Internship Programs">Technical Internship Programs (Tech)</option>
+                <option value="Business & Analytics Internship">Business &amp; Analytics Internship (Non-Tech)</option>
+              </optgroup>
+              <optgroup label="📁 PROJECTS">
+                <option value="Customized Technical Projects & Documentation">Customized Technical Projects &amp; Documentation (Tech)</option>
+                <option value="Survey-Based Projects & Research Reports">Survey-Based Projects &amp; Research Reports (Non-Tech)</option>
+                <option value="General Academic Partnership">General Academic Partnership (Academic / Non-Tech)</option>
+              </optgroup>
             </select>
           </div>
 
           <div class="form-field">
-            <label class="form-label">College / Institution</label>
-            <input type="text" id="add-lead-institution" class="form-input" placeholder="e.g. RV College of Engineering" maxlength="160">
-          </div>
-          <div class="form-field">
             <label class="form-label">Specialization / Domain</label>
             <input type="text" id="add-lead-domain" class="form-input" placeholder="e.g. Computer Science, AI, Finance" maxlength="160">
           </div>
-
-          <div class="form-field form-col-full">
+          <div class="form-field">
             <label class="form-label">Initial Status</label>
             <select id="add-lead-status" class="form-select">
               <option value="New">New</option>
@@ -1744,11 +1947,37 @@
        LEADS / ENQUIRIES ACTIONS (View, Modify, Add, Delete)
        =================================================================== */
 
+    function syncServiceSelect(prefix) {
+      const catEl = document.getElementById(`${prefix}-lead-category`);
+      const trEl = document.getElementById(`${prefix}-lead-track`);
+      const srvEl = document.getElementById(`${prefix}-lead-service`);
+      if (!catEl || !trEl || !srvEl) return;
+      const cat = catEl.value;
+      const tr = trEl.value;
+      if (cat === 'internship') {
+        srvEl.value = (tr === 'tech') ? 'Technical Internship Programs' : 'Business & Analytics Internship';
+      } else {
+        srvEl.value = (tr === 'tech') ? 'Customized Technical Projects & Documentation' : 'Survey-Based Projects & Research Reports';
+      }
+    }
+
+    function syncCategoryTrackFromService(prefix) {
+      const srvEl = document.getElementById(`${prefix}-lead-service`);
+      const catEl = document.getElementById(`${prefix}-lead-category`);
+      const trEl = document.getElementById(`${prefix}-lead-track`);
+      if (!srvEl || !catEl || !trEl) return;
+      const val = (srvEl.value || '').toLowerCase();
+      catEl.value = val.includes('internship') ? 'internship' : 'projects';
+      trEl.value = val.includes('technical') ? 'tech' : 'nontech';
+    }
+
     function viewDetails(id) {
       const item = leadsData.find(x => x.id === id);
       if (!item) return;
       document.getElementById('m-name').textContent = item.full_name;
-      document.getElementById('m-service').textContent = item.service;
+      const isIntern = (item.service || '').toLowerCase().includes('internship');
+      const isTech = (item.service || '').toLowerCase().includes('technical');
+      document.getElementById('m-service').textContent = `${isIntern ? '🎓 Internship' : '📁 Projects'} · ${isTech ? '💻 Tech' : '📊 Non-Tech'} (${item.service})`;
       document.getElementById('m-email').textContent = item.email;
       document.getElementById('m-phone').textContent = item.phone;
       document.getElementById('m-institution').textContent = item.institution || 'Not Provided';
@@ -1767,6 +1996,7 @@
       document.getElementById('edit-lead-email').value = item.email || '';
       document.getElementById('edit-lead-phone').value = item.phone || '';
       document.getElementById('edit-lead-service').value = item.service || 'Technical Internship Programs';
+      syncCategoryTrackFromService('edit');
       document.getElementById('edit-lead-institution').value = item.institution || '';
       document.getElementById('edit-lead-domain').value = item.domain || '';
       document.getElementById('edit-lead-status').value = item.status || 'New';
@@ -1837,6 +2067,21 @@
         const domEl = document.getElementById(`lead-domain-${id}`);
         if (domEl) domEl.textContent = payload.domain || 'General';
 
+        const srvEl = document.getElementById(`lead-service-${id}`);
+        if (srvEl) {
+          const isIntern = payload.service.toLowerCase().includes('internship');
+          const isTech = payload.service.toLowerCase().includes('technical');
+          srvEl.innerHTML = `
+            <div class="track-badge-container">
+              <div class="track-badge-pills">
+                <span class="badge-cat ${isIntern ? 'badge-cat-internship' : 'badge-cat-projects'}">${isIntern ? '🎓 INTERNSHIP' : '📁 PROJECTS'}</span>
+                <span class="badge-track ${isTech ? 'badge-track-tech' : 'badge-track-nontech'}">${isTech ? '💻 TECH' : '📊 NON-TECH'}</span>
+              </div>
+              <div class="track-sub-label">${payload.service}</div>
+            </div>
+          `;
+        }
+
         closeModal('edit-enquiry-modal');
         showToast('Enquiry modified successfully!');
       })
@@ -1847,6 +2092,7 @@
 
     function openAddEnquiryModal() {
       document.getElementById('form-add-enquiry').reset();
+      syncServiceSelect('add');
       openModal('add-enquiry-modal');
     }
 
@@ -2129,31 +2375,43 @@
 
 
     /* ===================================================================
-       FILTER & SEARCH TRIGGERS
+       FILTER & SEARCH TRIGGERS (Category, Track, Status, Search)
        =================================================================== */
     const searchInput = document.getElementById('search-input');
-    const serviceFilter = document.getElementById('service-filter');
+    const categoryFilter = document.getElementById('category-filter');
+    const trackFilter = document.getElementById('track-filter');
     const statusFilter = document.getElementById('status-filter');
 
     function applyFilters() {
-      const q = searchInput.value.trim();
-      const s = serviceFilter.value;
-      const st = statusFilter.value;
+      const q = searchInput ? searchInput.value.trim() : '';
+      const cat = categoryFilter ? categoryFilter.value : '';
+      const tr = trackFilter ? trackFilter.value : '';
+      const st = statusFilter ? statusFilter.value : '';
       const params = new URLSearchParams();
       if (q) params.set('search', q);
-      if (s) params.set('service', s);
+      if (cat) params.set('category', cat);
+      if (tr) params.set('track', tr);
       if (st) params.set('status', st);
       window.location.search = params.toString();
     }
 
-    let debounceTimer;
-    searchInput.addEventListener('input', () => {
-      clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(applyFilters, 400);
-    });
+    function setQuickFilter(cat, tr) {
+      if (categoryFilter) categoryFilter.value = cat;
+      if (trackFilter) trackFilter.value = tr;
+      applyFilters();
+    }
 
-    serviceFilter.addEventListener('change', applyFilters);
-    statusFilter.addEventListener('change', applyFilters);
+    let debounceTimer;
+    if (searchInput) {
+      searchInput.addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(applyFilters, 400);
+      });
+    }
+
+    if (categoryFilter) categoryFilter.addEventListener('change', applyFilters);
+    if (trackFilter) trackFilter.addEventListener('change', applyFilters);
+    if (statusFilter) statusFilter.addEventListener('change', applyFilters);
   </script>
 </body>
 </html>
