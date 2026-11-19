@@ -1001,13 +1001,31 @@ def get_stats():
     cur.execute("SELECT COUNT(*) FROM enquiries WHERE service LIKE '%Customized Technical Project%';")
     projects_tech = cur.fetchone()[0]
 
-    cur.execute("SELECT COUNT(*) FROM enquiries WHERE service LIKE '%Survey-Based%';")
+    cur.execute("SELECT COUNT(*) FROM enquiries WHERE (service LIKE '%Survey-Based%' OR service LIKE '%Partnership%');")
     projects_nontech = cur.fetchone()[0]
 
     internship_total = internship_tech + internship_nontech
     projects_total = projects_tech + projects_nontech
     tech_total = internship_tech + projects_tech
     nontech_total = internship_nontech + projects_nontech
+
+    # Enrolled breakdown for each option and track
+    cur.execute("SELECT COUNT(*) FROM enquiries WHERE service LIKE '%Technical Internship%' AND status = 'Enrolled';")
+    internship_tech_enrolled = cur.fetchone()[0]
+
+    cur.execute("SELECT COUNT(*) FROM enquiries WHERE service LIKE '%Business & Analytics%' AND status = 'Enrolled';")
+    internship_nontech_enrolled = cur.fetchone()[0]
+
+    cur.execute("SELECT COUNT(*) FROM enquiries WHERE service LIKE '%Customized Technical Project%' AND status = 'Enrolled';")
+    projects_tech_enrolled = cur.fetchone()[0]
+
+    cur.execute("SELECT COUNT(*) FROM enquiries WHERE (service LIKE '%Survey-Based%' OR service LIKE '%Partnership%') AND status = 'Enrolled';")
+    projects_nontech_enrolled = cur.fetchone()[0]
+
+    internship_enrolled = internship_tech_enrolled + internship_nontech_enrolled
+    projects_enrolled = projects_tech_enrolled + projects_nontech_enrolled
+    tech_enrolled = internship_tech_enrolled + projects_tech_enrolled
+    nontech_enrolled = internship_nontech_enrolled + projects_nontech_enrolled
     
     cur.close()
     conn.close()
@@ -1026,5 +1044,13 @@ def get_stats():
         "projects_nontech": projects_nontech,
         "tech_total": tech_total,
         "nontech_total": nontech_total,
+        "internship_enrolled": internship_enrolled,
+        "projects_enrolled": projects_enrolled,
+        "internship_tech_enrolled": internship_tech_enrolled,
+        "internship_nontech_enrolled": internship_nontech_enrolled,
+        "projects_tech_enrolled": projects_tech_enrolled,
+        "projects_nontech_enrolled": projects_nontech_enrolled,
+        "tech_enrolled": tech_enrolled,
+        "nontech_enrolled": nontech_enrolled,
         "db_status": DB_STATUS
     }

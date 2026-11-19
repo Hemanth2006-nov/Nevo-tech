@@ -1109,22 +1109,28 @@
   <!-- Main Container -->
   <main class="admin-container">
 
-    <!-- KPI Metric Cards (6 metrics with Internship & Projects, Tech & Non-Tech breakdown) -->
+    <!-- KPI Metric Cards (6 metrics with Internship & Projects, Tech & Non-Tech breakdown & Enrolled numbers) -->
     <div class="metrics-grid">
       <div class="metric-card card-total">
         <span class="metric-label">Total Inquiries</span>
         <span class="metric-val" id="metric-total">{{ stats.total }}</span>
-        <span style="font-size: 0.74rem; color: var(--text-muted);">Tech: {{ stats.tech_total }} · Non-Tech: {{ stats.nontech_total }}</span>
+        <span style="font-size: 0.74rem; color: var(--text-muted);">
+          🎓 Enrolled: <strong style="color: #4ade80;">{{ stats.enrolled }}</strong> · Tech: {{ stats.tech_total }} · Non-Tech: {{ stats.nontech_total }}
+        </span>
       </div>
       <div class="metric-card card-enrolled">
         <span class="metric-label">🎓 Internships</span>
         <span class="metric-val" id="metric-internship">{{ stats.internship_total }}</span>
-        <span style="font-size: 0.74rem; color: #4ade80;">💻 Tech: {{ stats.internship_tech }} · 📊 Non-Tech: {{ stats.internship_nontech }}</span>
+        <span style="font-size: 0.74rem; color: #4ade80;">
+          🎓 Enrolled: <strong style="color: #4ade80;">{{ stats.internship_enrolled }}</strong> (Tech: {{ stats.internship_tech_enrolled }} · Non-Tech: {{ stats.internship_nontech_enrolled }})
+        </span>
       </div>
       <div class="metric-card card-team">
         <span class="metric-label">📁 Projects</span>
         <span class="metric-val" id="metric-projects">{{ stats.projects_total }}</span>
-        <span style="font-size: 0.74rem; color: #c084fc;">💻 Tech: {{ stats.projects_tech }} · 📊 Non-Tech: {{ stats.projects_nontech }}</span>
+        <span style="font-size: 0.74rem; color: #c084fc;">
+          🎓 Enrolled: <strong style="color: #c084fc;">{{ stats.projects_enrolled }}</strong> (Tech: {{ stats.projects_tech_enrolled }} · Non-Tech: {{ stats.projects_nontech_enrolled }})
+        </span>
       </div>
       <div class="metric-card card-new">
         <span class="metric-label">New Leads</span>
@@ -1139,7 +1145,9 @@
       <div class="metric-card card-website">
         <span class="metric-label">Enrolled / Converted</span>
         <span class="metric-val" id="metric-enrolled">{{ stats.enrolled }}</span>
-        <span style="font-size: 0.74rem; color: #4ade80;">Active students</span>
+        <span style="font-size: 0.74rem; color: #4ade80;">
+          💻 Tech: {{ stats.tech_enrolled }} · 📊 Non-Tech: {{ stats.nontech_enrolled }}
+        </span>
       </div>
     </div>
 

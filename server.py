@@ -764,7 +764,7 @@ def admin_dashboard():
     search = request.args.get("search")
     return render_template(
         "admin.html",
-        enquiries=db.get_all_enquiries(service_filter, status_filter, search, category=category_filter, track=track_filter),
+        enquiries=db.get_all_enquiries(),
         team_members=db.get_all_team_members(),
         website_items=db.get_all_website_items(),
         stats=db.get_stats(),
