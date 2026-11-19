@@ -267,6 +267,12 @@ def health_ready():
     return jsonify({"status": "ready", "database": db.DB_STATUS})
 
 
+@app.route("/contact", strict_slashes=False)
+@app.route("/contact.html")
+def contact_page():
+    return send_from_directory(".", "contact.html")
+
+
 @app.route("/<path:path>")
 def static_proxy(path):
     if path.startswith("assets/") and not any(part.startswith(".") for part in path.split("/")):
@@ -274,6 +280,10 @@ def static_proxy(path):
     if "/" not in path and os.path.splitext(path)[1].lower() in {".html", ".css", ".js"}:
         if os.path.isfile(path):
             return send_from_directory(".", path)
+    if "/" not in path:
+        clean_name = path.rstrip("/")
+        if os.path.isfile(f"{clean_name}.html"):
+            return send_from_directory(".", f"{clean_name}.html")
     abort(404)
 
 

@@ -888,22 +888,18 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     };
 
-    // Listen to changes on service selects
-    const homeServiceSelect = document.getElementById('home-service');
-    if (homeServiceSelect) {
-      homeServiceSelect.addEventListener('change', () => {
-        const form = homeServiceSelect.closest('form');
-        updateDomainOptions(form, homeServiceSelect.value);
+    // Listen to changes on service selects across all forms (home, modal, contact page)
+    document.querySelectorAll('select[name="service"], .service-select, #home-service, #modal-service-select').forEach(sel => {
+      sel.addEventListener('change', () => {
+        const form = sel.closest('form');
+        updateDomainOptions(form, sel.value);
       });
-    }
-
-    const modalServiceSelect = modal ? modal.querySelector('#modal-service-select') : null;
-    if (modalServiceSelect) {
-      modalServiceSelect.addEventListener('change', () => {
-        const form = modalServiceSelect.closest('form');
-        updateDomainOptions(form, modalServiceSelect.value);
-      });
-    }
+      // Initialize on load if a value is selected
+      const form = sel.closest('form');
+      if (sel.value && form) {
+        updateDomainOptions(form, sel.value);
+      }
+    });
 
     // Check URL parameters for preselected service
     try {

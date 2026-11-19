@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us &amp; Direct Channels — NEVO TECH</title>
+  <meta name="description" content="Reach NEVO TECH directly via Phone, WhatsApp, Gmail, or at our Bengaluru Development Hub. Submit your technical or academic enquiry with zero fees.">
+  <link rel="icon" type="image/png" href="assets/nevo-logo-mark.png">
+
+  <link rel="stylesheet" href="styles.css?v=2.9">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- High-Performance Lenis Smooth Inertial Scroll (Locally Bundled) -->
+  <script src="assets/lenis.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="contact-page">
+
+  <div class="scroll-progress-line" id="scroll-progress-line"></div>
+  <!-- Circular Scroll Progress & Back to Top Button -->
+  <button class="back-to-top" id="back-to-top-btn" aria-label="Scroll Back to Top" title="Back to Top">
+    <svg class="progress-ring" width="48" height="48" viewBox="0 0 48 48" aria-hidden="true">
+      <circle class="progress-ring__circle-bg" stroke="rgba(255, 255, 255, 0.12)" stroke-width="3" fill="transparent" r="20" cx="24" cy="24"/>
+      <circle class="progress-ring__circle" id="scroll-progress-circle" stroke="url(#progress-gradient)" stroke-width="3.2" stroke-linecap="round" fill="transparent" r="20" cx="24" cy="24"/>
+      <defs>
+        <linearGradient id="progress-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#38bdf8"/>
+          <stop offset="100%" stop-color="#25d366"/>
+        </linearGradient>
+      </defs>
+    </svg>
+    <span class="back-to-top-arrow">↑</span>
+  </button>
+
+  <!-- NAVIGATION BAR -->
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a href="index.html" class="brand-logo" title="Return to NEVO TECH Home">
+        <div class="brand-icon">
+          <img src="assets/nevo-logo-mark.png" alt="NEVO TECH Logo" class="brand-logo-mark">
+        </div>
+        <div class="brand-text brand-text-inline">
+          <span class="brand-name">NEVO</span>
+          <span class="brand-sub">TECH</span>
+        </div>
+      </a>
+
+      <nav>
+        <ul class="nav-menu">
+          <li><a href="index.html#home" class="nav-link">Home</a></li>
+          <li class="nav-item-dropdown">
+            <a href="index.html#services" class="nav-link">Services ▾</a>
+            <ul class="nav-dropdown">
+              <li><a href="service-technical-internships.html" class="nav-dropdown-link"><span>&lt;/&gt;</span> Technical Internship Programs</a></li>
+              <li><a href="service-business-analytics-internship.html" class="nav-dropdown-link"><span>📊</span> Business &amp; Analytics Internship</a></li>
+              <li><a href="service-custom-projects-documentation.html" class="nav-dropdown-link"><span>🛠️</span> Customized Technical Projects &amp; Documentation</a></li>
+              <li><a href="service-survey-research-reports.html" class="nav-dropdown-link"><span>📋</span> Survey-Based Projects &amp; Research Reports</a></li>
+            </ul>
+          </li>
+          <li><a href="index.html#about" class="nav-link">About</a></li>
+          <li><a href="index.html#projects" class="nav-link">Our Work</a></li>
+          <li><a href="index.html#process" class="nav-link">Process</a></li>
+          <li><a href="index.html#industries" class="nav-link">Industries</a></li>
+          <li><a href="index.html#testimonials" class="nav-link">Reviews</a></li>
+          <li><a href="contact.html" class="nav-link active">Contact</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="#contact-form-section" class="btn-enquiry-nav" title="Submit an Enquiry">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <polyline points="22,6 12,13 2,6"/>
+          </svg>
+          <span>Enquire Now</span>
+        </a>
+        <button class="mobile-toggle" aria-label="Open Navigation Menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- =================================================================
+       CONTACT HERO SECTION
+       ================================================================= -->
+  <section class="contact-hero-section">
+    <div class="hero-bg-glow"></div>
+    <div class="hero-grid-pattern"></div>
+
+    <div class="container">
+      <div class="service-breadcrumb" style="justify-content: center; margin-bottom: 1.5rem;">
+        <a href="index.html">Home</a>
+        <span>/</span>
+        <span class="current">Contact Us</span>
+      </div>
+
+      <div class="contact-hero-content">
+        <div class="hero-badge-pill" style="margin: 0 auto 1.25rem;">
+          <span class="hero-badge-dot" style="background: #38bdf8;"></span>
+          <span>GET IN TOUCH · DIRECT CHANNELS</span>
+        </div>
+        <h1 class="hero-title" style="font-size: clamp(2.2rem, 4.2vw, 3.4rem); margin-bottom: 1rem;">
+          Contact <span class="text-gradient">NEVO TECH</span>
+        </h1>
+        <p class="hero-subtitle" style="max-width: 680px; margin: 0 auto; color: #94a3b8; font-size: 1.05rem; line-height: 1.65;">
+          Direct communication lines for internship registration, technical capstone guidance, enterprise research, and college partnerships. We are ready to assist you.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================================
+       DIRECT COMMUNICATION CHANNELS (3 Cyber Cards)
+       ================================================================= -->
+  <section class="contact-cards-section">
+    <div class="container">
+      <div class="contact-cards-grid">
+        <!-- Card 1: WhatsApp & Phone -->
+        <div class="contact-cyber-card">
+          <div class="contact-card-icon-wrap icon-whatsapp">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
+              <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2m.01 1.67c2.2 0 4.26.86 5.82 2.42a8.23 8.23 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24m4.52 11.66c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.13-1.05-.39-2-1.23-.74-.66-1.24-1.47-1.39-1.72-.14-.25-.01-.38.11-.51.11-.11.25-.29.37-.44.13-.14.17-.25.25-.42.08-.17.04-.31-.02-.44-.06-.13-.56-1.35-.77-1.85-.2-.49-.41-.42-.56-.43h-.48c-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.09s.9 2.43 1.03 2.6c.13.17 1.77 2.7 4.29 3.79.6.26 1.07.41 1.43.53.6.19 1.15.16 1.58.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.08.15-1.18-.06-.11-.23-.17-.48-.3"/>
+            </svg>
+          </div>
+          <div class="contact-card-body">
+            <span class="contact-card-badge">INSTANT MESSAGING &amp; CALLS</span>
+            <h3 class="contact-card-title">Phone &amp; WhatsApp Desk</h3>
+            <p class="contact-card-val">+91 99765 43210</p>
+            <p class="contact-card-meta">24/7 Available · Mon – Sat · 9:00 AM – 6:00 PM IST</p>
+            <div class="contact-card-actions">
+              <a href="https://wa.me/919976543210?text=Hi%20NEVO%20TECH%2C%20I%20would%20like%20to%20enquire%20about%20your%20services%20and%20programs." target="_blank" rel="noopener noreferrer" class="btn-contact-action btn-contact-whatsapp">
+                <span>Chat on WhatsApp</span>
+              </a>
+              <a href="tel:+919976543210" class="btn-contact-action btn-contact-call">
+                <span>Call Directly</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2: Official Gmail -->
+        <div class="contact-cyber-card">
+          <div class="contact-card-icon-wrap icon-gmail">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
+              <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/>
+            </svg>
+          </div>
+          <div class="contact-card-body">
+            <span class="contact-card-badge">OFFICIAL COMMUNICATIONS</span>
+            <h3 class="contact-card-title">Official Gmail Desk</h3>
+            <p class="contact-card-val" style="font-size: 1rem; word-break: break-all;">nevotechsolutions@gmail.com</p>
+            <p class="contact-card-meta">24/7 Digital Intake · Guaranteed Reply in 24h</p>
+            <div class="contact-card-actions">
+              <a href="https://mail.google.com/mail/?view=cm&fs=1&to=nevotechsolutions@gmail.com&su=Direct%20Inquiry%20for%20NEVO%20TECH" target="_blank" rel="noopener noreferrer" class="btn-contact-action btn-contact-gmail">
+                <span>Open in Gmail ✉</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3: Innovation Labs / Location -->
+        <div class="contact-cyber-card">
+          <div class="contact-card-icon-wrap icon-location">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
+            </svg>
+          </div>
+          <div class="contact-card-body">
+            <span class="contact-card-badge">OPERATIONS &amp; LABS</span>
+            <h3 class="contact-card-title">Development Hub</h3>
+            <p class="contact-card-val">Bengaluru, Karnataka, India</p>
+            <p class="contact-card-meta">Silicon Valley of India · Tech Corridor</p>
+            <div class="contact-card-actions">
+              <a href="https://www.google.com/maps/search/Bengaluru+Karnataka" target="_blank" rel="noopener noreferrer" class="btn-contact-action btn-contact-map">
+                <span>Explore Location ↗</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================================
+       ONLINE CONSULTATION & CONTACT FORM SUITE
+       ================================================================= -->
+  <section class="section" id="contact-form-section" style="padding-top: 1rem;">
+    <div class="container">
+      <div class="enquiry-suite-grid">
+
+        <!-- Left Column: Information Card -->
+        <div class="enquiry-info-card">
+          <div class="enquiry-info-pill">
+            <span>✦</span>
+            <span>FAST RESPONSE GUARANTEE</span>
+          </div>
+
+          <h2 class="enquiry-info-title">
+            Let's Discuss Your <span>Technical Goals</span>
+          </h2>
+
+          <p class="enquiry-info-desc">
+            Whether you are a student seeking an industry-grade internship, an academic institution planning an MoU, or an organization requiring custom analytics and documentation, our technical advisors are ready to guide you.
+          </p>
+
+          <ul class="enquiry-perks-list">
+            <li class="enquiry-perk-item">
+              <div class="enquiry-perk-icon">✓</div>
+              <span><strong>100% Free Initial Consultation:</strong> Zero fees or financial obligations to enquire.</span>
+            </li>
+            <li class="enquiry-perk-item">
+              <div class="enquiry-perk-icon">✓</div>
+              <span><strong>Fast 24-Hour Reply:</strong> Dedicated academic and technical mentor responds promptly.</span>
+            </li>
+            <li class="enquiry-perk-item">
+              <div class="enquiry-perk-icon">✓</div>
+              <span><strong>Tailored Learning Tracks:</strong> Web development, AI/ML, Cloud DevOps, and Data Science.</span>
+            </li>
+            <li class="enquiry-perk-item">
+              <div class="enquiry-perk-icon">✓</div>
+              <span><strong>Institutional Support:</strong> Direct MoUs and customized workshop cohorts for colleges.</span>
+            </li>
+          </ul>
+
+          <div class="enquiry-direct-contacts">
+            <div class="enquiry-contact-item">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              <span>Desk: <a href="tel:+919976543210">+91 99765 43210</a></span>
+            </div>
+            <div class="enquiry-contact-item">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              <span>Gmail: <a href="https://mail.google.com/mail/?view=cm&fs=1&to=nevotechsolutions@gmail.com&su=Direct%20Inquiry%20for%20NEVO%20TECH" target="_blank" rel="noopener noreferrer">nevotechsolutions@gmail.com</a></span>
+            </div>
+            <div class="enquiry-contact-item">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span>Hub: Bengaluru, Karnataka, India</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Interactive Form -->
+        <div class="enquiry-form-card">
+          <div class="enquiry-form-header">
+            <h3 class="enquiry-form-heading">Send an Official Message</h3>
+            <p class="enquiry-form-subheading">Submit your inquiry details below. Our technical mentor will get back to you promptly.</p>
+          </div>
+
+          <form class="nevo-enquiry-form" id="contact-enquiry-form">
+            <!-- Row 1: Name and Email -->
+            <div class="form-row-2col">
+              <div class="form-group">
+                <label class="form-label" for="contact-fullname">Full Name <span class="req">*</span></label>
+                <input type="text" id="contact-fullname" name="fullName" class="form-input" placeholder="Your Full Name" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="contact-email">Email Address <span class="req">*</span></label>
+                <input type="email" id="contact-email" name="email" class="form-input" placeholder="your.email@example.com" required>
+              </div>
+            </div>
+
+            <!-- Row 2: Phone and Institution -->
+            <div class="form-row-2col">
+              <div class="form-group">
+                <label class="form-label" for="contact-phone">Phone / WhatsApp Number <span class="req">*</span></label>
+                <input type="tel" id="contact-phone" name="phone" class="form-input" placeholder="+91 98765 43210" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="contact-institution">College / University / Organization</label>
+                <input type="text" id="contact-institution" name="institution" class="form-input" placeholder="e.g. VTU, PES, SRM, Company">
+              </div>
+            </div>
+
+            <!-- Row 3: Program Track and Focus Domain -->
+            <div class="form-row-2col">
+              <div class="form-group">
+                <label class="form-label" for="contact-service-select">Program / Service Category <span class="req">*</span></label>
+                <select id="contact-service-select" name="service" class="form-select service-select" required>
+                  <option value="Technical Internship Programs" selected>Technical Internship Programs</option>
+                  <option value="Business &amp; Analytics Internship">Business &amp; Analytics Internship</option>
+                  <option value="Customized Technical Projects &amp; Documentation">Customized Technical Projects &amp; Documentation</option>
+                  <option value="Survey-Based Projects &amp; Research Reports">Survey-Based Projects &amp; Research Reports</option>
+                  <option value="General Consultation">General Consultation / College Partnership</option>
+                </select>
+              </div>
+
+              <div class="form-group" id="contact-domain-group">
+                <label class="form-label" for="contact-domain-select">Focus Domain / Track <span class="req">*</span></label>
+                <select id="contact-domain-select" class="form-select domain-select" data-role="domain-select" required>
+                  <option value="" disabled selected>Choose Track (Web / AI / Cloud / Data / Other)...</option>
+                  <option value="Web Development (Full-Stack / Python / MERN)">Web Development (Full-Stack / Python / MERN)</option>
+                  <option value="Artificial Intelligence &amp; Machine Learning (AI / ML)">Artificial Intelligence &amp; Machine Learning (AI / ML)</option>
+                  <option value="Cloud Computing &amp; DevOps">Cloud Computing &amp; DevOps</option>
+                  <option value="Data Science &amp; Analytics">Data Science &amp; Analytics</option>
+                  <option value="Other">Other (Please specify)</option>
+                </select>
+                <div class="domain-other-wrap" id="contact-domain-other-wrap" style="display: none;">
+                  <input type="text" id="contact-domain-other" class="form-input domain-other-input" data-role="domain-other" placeholder="Please specify your custom track / domain...">
+                </div>
+              </div>
+            </div>
+
+            <!-- Message Area -->
+            <div class="form-group">
+              <label class="form-label" for="contact-message">Requirements / Objectives</label>
+              <textarea id="contact-message" name="message" class="form-textarea" placeholder="Describe your background, learning objectives, project requirements, or institutional collaboration query..."></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn-enquiry-submit">
+              <span>Send Contact Inquiry</span>
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+
+            <div class="form-privacy-note">
+              <span>🔒 100% Confidential. Zero fees required to enquire or consult.</span>
+            </div>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================================
+       FREQUENTLY ASKED QUESTIONS SECTION
+       ================================================================= -->
+  <section class="contact-faq-section">
+    <div class="container">
+      <div style="text-align: center; max-width: 650px; margin: 0 auto;">
+        <div class="hero-badge-pill" style="margin: 0 auto 1rem;">
+          <span class="hero-badge-dot"></span>
+          <span>QUICK ASSISTANCE</span>
+        </div>
+        <h2 class="section-title">Common Questions &amp; Support</h2>
+        <p class="section-desc">Everything you need to know about contacting NEVO TECH and receiving academic or technical guidance.</p>
+      </div>
+
+      <div class="contact-faq-grid">
+        <div class="contact-faq-card">
+          <h3 class="contact-faq-q">How soon will I receive a response?</h3>
+          <p class="contact-faq-a">Our academic mentors and support staff respond within 2 to 4 hours during working hours (9:00 AM – 6:00 PM IST), with guaranteed turnaround under 24 hours.</p>
+        </div>
+
+        <div class="contact-faq-card">
+          <h3 class="contact-faq-q">Is there any payment required to enquire?</h3>
+          <p class="contact-faq-a">Zero payment. Submitting an enquiry, reviewing program syllabi, or having an exploratory consultation with our technical leads is 100% free.</p>
+        </div>
+
+        <div class="contact-faq-card">
+          <h3 class="contact-faq-q">Can colleges and universities partner with NEVO TECH?</h3>
+          <p class="contact-faq-a">Yes! We provide official institutional MoUs, cohort-based student internship training, faculty development programs, and hackathon co-sponsorships.</p>
+        </div>
+
+        <div class="contact-faq-card">
+          <h3 class="contact-faq-q">Can I get instant answers via WhatsApp?</h3>
+          <p class="contact-faq-a">Yes. Click the "Chat on WhatsApp" button on this page or message us directly at +91 99765 43210 for immediate queries regarding registrations.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================================
+       FOOTER (Deep Graphite & High-Tech Hierarchy)
+       ================================================================= -->
+  <footer id="footer" class="site-footer">
+    <div class="container">
+      <div class="footer-top-grid">
+        <!-- Col 1: Brand & Bio -->
+        <div class="footer-brand-col">
+          <a href="index.html" class="brand-logo footer-logo">
+            <div class="brand-icon">
+              <img src="assets/nevo-logo-mark.png" alt="NEVO TECH Logo" class="brand-logo-mark">
+            </div>
+            <div class="brand-text brand-text-inline">
+              <span class="brand-name">NEVO</span>
+              <span class="brand-sub">TECH</span>
+            </div>
+          </a>
+          <p class="footer-bio">
+            Pioneering industry-grade technical internships, applied machine learning systems, and enterprise capstone research for next-generation engineers.
+          </p>
+          <div class="footer-social-links">
+            <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="LinkedIn" title="NEVO TECH on LinkedIn">
+              <i class="fab fa-linkedin-in" aria-hidden="true"></i>
+            </a>
+            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Twitter / X" title="NEVO TECH on X">
+              <i class="fab fa-x-twitter" aria-hidden="true"></i>
+            </a>
+            <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Instagram" title="NEVO TECH on Instagram">
+              <i class="fab fa-instagram" aria-hidden="true"></i>
+            </a>
+            <a href="https://www.youtube.com/@Nevotechsolutions" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="YouTube" title="NEVO TECH on YouTube">
+              <i class="fab fa-youtube" aria-hidden="true"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Col 2: Quick Links -->
+        <div>
+          <h4 class="footer-col-title">Navigation</h4>
+          <ul class="footer-nav-list">
+            <li><a href="index.html#home" class="footer-link">Home</a></li>
+            <li><a href="index.html#services" class="footer-link">Services</a></li>
+            <li><a href="index.html#about" class="footer-link">About Us</a></li>
+            <li><a href="index.html#projects" class="footer-link">Portfolio</a></li>
+            <li><a href="index.html#process" class="footer-link">Our Process</a></li>
+            <li><a href="index.html#testimonials" class="footer-link">Reviews</a></li>
+            <li><a href="contact.html" class="footer-link">Contact</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 3: Programs & Services -->
+        <div>
+          <h4 class="footer-col-title">Programs</h4>
+          <ul class="footer-nav-list">
+            <li><a href="service-technical-internships.html" class="footer-link">Technical Internships</a></li>
+            <li><a href="service-business-analytics-internship.html" class="footer-link">Business Analytics</a></li>
+            <li><a href="service-custom-projects-documentation.html" class="footer-link">Custom Projects &amp; Docs</a></li>
+            <li><a href="service-survey-research-reports.html" class="footer-link">Research &amp; Surveys</a></li>
+            <li><a href="contact.html" class="footer-link">College Partnerships</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 4: Contact Info -->
+        <div>
+          <h4 class="footer-col-title">Contact Us</h4>
+          <ul class="footer-contact-list">
+            <li class="contact-item">
+              <span class="contact-icon contact-icon-location" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              </span>
+              <a href="https://www.google.com/maps/search/Bengaluru+Karnataka" target="_blank" rel="noopener noreferrer" class="footer-link">Bengaluru, Karnataka, India</a>
+            </li>
+            <li class="contact-item">
+              <span class="contact-icon contact-icon-whatsapp" aria-hidden="true" title="WhatsApp Contact">
+                <svg xmlns="http://www.w3.org/2000/svg" class="whatsapp-icon" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.016-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/></svg>
+              </span>
+              <a href="https://wa.me/919976543210?text=Hi%20NEVO%20TECH%2C%20I%20would%20like%20to%20enquire%20about%20your%20services%20and%20programs." target="_blank" rel="noopener noreferrer" class="footer-link">+91 99765 43210</a>
+            </li>
+            <li class="contact-item">
+              <span class="contact-icon contact-icon-email" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+              </span>
+              <a href="https://mail.google.com/mail/?view=cm&fs=1&to=nevotechsolutions@gmail.com&su=Inquiry%20via%20NEVO%20TECH%20Website" target="_blank" rel="noopener noreferrer" class="footer-link">nevotechsolutions@gmail.com</a>
+            </li>
+            <li class="contact-item">
+              <span class="contact-icon contact-icon-hours" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </span>
+              <span>24/7 Available</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p class="copyright">&copy; 2026 NEVO TECH Solutions. All rights reserved.</p>
+        <p class="footer-tagline">Building the Future of Tech Internships &amp; Research</p>
+      </div>
+    </div>
+  </footer>
+
+  <div id="toast-notification" class="toast-notification">
+    <span style="color: var(--color-highlight); font-size: 1.2rem;">✦</span>
+    <span id="toast-message">Notification message here</span>
+  </div>
+
+  <script src="ctaScene3d.js"></script>
+  <script src="app.js?v=2.9"></script>
+
+  <!-- =================================================================
+       GLOBAL QUICK ENQUIRY MODAL (ZERO AMOUNT ARCHITECTURE)
+       ================================================================= -->
+  <div class="enquiry-modal-backdrop" id="enquiry-modal" aria-hidden="true" role="dialog" aria-modal="true" data-lenis-prevent>
+    <div class="enquiry-modal-dialog" data-lenis-prevent>
+      <div class="enquiry-modal-header">
+        <div>
+          <h3 class="enquiry-modal-title">Service Enquiry &amp; Registration</h3>
+          <p class="enquiry-modal-subtitle">Submit your details and our academic mentor will contact you promptly.</p>
+        </div>
+        <button type="button" class="enquiry-modal-close" id="enquiry-modal-close" aria-label="Close modal">&times;</button>
+      </div>
+
+      <form class="nevo-enquiry-form" id="modal-enquiry-form">
+        <div class="form-row-2col">
+          <div class="form-group">
+            <label class="form-label" for="modal-fullname">Full Name <span class="req">*</span></label>
+            <input type="text" id="modal-fullname" name="fullName" class="form-input" placeholder="Your Full Name" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="modal-email">Email Address <span class="req">*</span></label>
+            <input type="email" id="modal-email" name="email" class="form-input" placeholder="your.email@example.com" required>
+          </div>
+        </div>
+
+        <div class="form-row-2col">
+          <div class="form-group">
+            <label class="form-label" for="modal-phone">Phone / WhatsApp Number <span class="req">*</span></label>
+            <input type="tel" id="modal-phone" name="phone" class="form-input" placeholder="+91 98765 43210" required>
+          </div>
+          <div class="form-group" id="modal-service-select-wrap">
+            <label class="form-label" for="modal-service-select">Program / Service <span class="req">*</span></label>
+            <select id="modal-service-select" name="service" class="form-select service-select" required>
+              <option value="Technical Internship Programs" selected>Technical Internship Programs</option>
+              <option value="Business &amp; Analytics Internship">Business &amp; Analytics Internship</option>
+              <option value="Customized Technical Projects &amp; Documentation">Customized Technical Projects &amp; Documentation</option>
+              <option value="Survey-Based Projects &amp; Research Reports">Survey-Based Projects &amp; Research Reports</option>
+              <option value="General Consultation">General Consultation / College Partnership</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row-2col">
+          <div class="form-group">
+            <label class="form-label" for="modal-institution">College / University / Company</label>
+            <input type="text" id="modal-institution" name="institution" class="form-input" placeholder="e.g. VTU, PES University, SRM">
+          </div>
+          <div class="form-group" id="modal-domain-group">
+            <label class="form-label" for="modal-domain-select">Focus Domain / Track <span class="req">*</span></label>
+            <select id="modal-domain-select" class="form-select domain-select" data-role="domain-select" required>
+              <option value="" disabled selected>Choose Track (Web / AI / Cloud / Data / Other)...</option>
+              <option value="Web Development (Full-Stack / Python / MERN)">Web Development (Full-Stack / Python / MERN)</option>
+              <option value="Artificial Intelligence &amp; Machine Learning (AI / ML)">Artificial Intelligence &amp; Machine Learning (AI / ML)</option>
+              <option value="Cloud Computing &amp; DevOps">Cloud Computing &amp; DevOps</option>
+              <option value="Data Science &amp; Analytics">Data Science &amp; Analytics</option>
+              <option value="Other">Other (Please specify)</option>
+            </select>
+            <div class="domain-other-wrap" id="modal-domain-other-wrap" style="display: none;">
+              <input type="text" id="modal-domain-other" class="form-input domain-other-input" data-role="domain-other" placeholder="Please specify your custom track / domain...">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="modal-message">Requirements / Objectives</label>
+          <textarea id="modal-message" name="message" class="form-textarea" placeholder="Briefly describe your requirements, project scope, or learning goals..."></textarea>
+        </div>
+
+        <button type="submit" class="btn-enquiry-submit">
+          <span>Submit Enquiry</span>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+
+        <div class="form-privacy-note">
+          <span>🔒 100% Confidential academic &amp; technical consultation. No payment required to enquire.</span>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</body>
+</html>
