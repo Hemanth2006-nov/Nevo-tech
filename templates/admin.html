@@ -486,135 +486,15 @@
       line-height: 1.25;
     }
 
-    /* Interactive Clickable Filter Bar: Service Options & Tracks */
-    .interactive-filter-bar {
+    .table-meta-bar {
       display: flex;
-      align-items: center;
-      gap: 1.25rem;
-      background: rgba(15, 23, 42, 0.85);
-      border: 1px solid rgba(56, 189, 248, 0.25);
-      border-radius: 12px;
-      padding: 0.65rem 1.15rem;
-      margin-bottom: 1.15rem;
-      flex-wrap: wrap;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    }
-    .filter-btn-group {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-    }
-    .filter-group-title {
-      font-size: 0.72rem;
-      font-weight: 800;
-      color: var(--text-muted);
-      letter-spacing: 0.06em;
-      margin-right: 0.2rem;
-    }
-    .filter-tab-pill {
-      background: rgba(30, 41, 59, 0.8);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      color: #cbd5e1;
-      padding: 6px 14px;
-      border-radius: 9999px;
-      font-size: 0.82rem;
-      font-weight: 700;
-      cursor: pointer;
-      font-family: inherit;
-      transition: all 0.2s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-    }
-    .filter-tab-pill:hover {
-      background: rgba(56, 189, 248, 0.15);
-      border-color: var(--cyan);
-      color: #ffffff;
-      transform: translateY(-1px);
-    }
-    .filter-tab-pill.active {
-      background: var(--cyan);
-      border-color: var(--cyan);
-      color: #050811;
-      font-weight: 800;
-      box-shadow: 0 0 15px rgba(56, 189, 248, 0.45);
-    }
-    .filter-divider-v {
-      width: 1px;
-      height: 24px;
-      background: rgba(255, 255, 255, 0.15);
-    }
-    @media (max-width: 768px) {
-      .filter-divider-v { display: none; }
-    }
-
-    /* Live Filter Status Summary Bar */
-    .filter-status-bar {
-      display: flex;
-      align-items: center;
       justify-content: space-between;
-      padding: 0.75rem 1.25rem;
-      background: rgba(15, 23, 42, 0.75);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      margin-bottom: 1.25rem;
-      font-size: 0.85rem;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-    }
-    .filter-status-info {
-      display: flex;
       align-items: center;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-    }
-    .filter-status-tag {
-      font-size: 0.7rem;
-      font-weight: 800;
-      letter-spacing: 0.06em;
-      padding: 0.2rem 0.55rem;
-      border-radius: 6px;
-      background: rgba(56, 189, 248, 0.15);
-      color: var(--cyan);
-      border: 1px solid rgba(56, 189, 248, 0.3);
-    }
-    .filter-status-text {
-      color: #ffffff;
-      font-weight: 600;
-    }
-    .filter-status-divider {
-      color: rgba(255, 255, 255, 0.2);
-    }
-    .filter-status-enrolled {
-      color: #4ade80;
-      font-weight: 700;
-      background: rgba(74, 222, 128, 0.12);
-      padding: 0.25rem 0.65rem;
-      border-radius: 6px;
-      border: 1px solid rgba(74, 222, 128, 0.3);
-    }
-    .filter-status-active-desc {
-      font-size: 0.8rem;
-      color: #94a3b8;
-      font-style: italic;
-    }
-    .btn-reset-filters {
-      background: transparent;
-      border: 1px solid rgba(148, 163, 184, 0.3);
-      color: #94a3b8;
-      padding: 0.35rem 0.8rem;
-      border-radius: 6px;
-      font-size: 0.78rem;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: inherit;
-      transition: all 0.2s ease;
-    }
-    .btn-reset-filters:hover {
-      border-color: var(--cyan);
-      color: #ffffff;
-      background: rgba(56, 189, 248, 0.1);
+      padding: 0.85rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      background: rgba(15, 23, 42, 0.4);
     }
 
     .service-badge {
@@ -1210,21 +1090,22 @@
            <span onclick="event.stopPropagation(); setQuickFilter('projects', 'nontech')" style="text-decoration: underline; cursor: pointer;" title="Filter Non-Tech Projects">📊 Non-Tech: {{ stats.projects_nontech_enrolled }}</span>)
         </span>
       </div>
-      <div class="metric-card card-new" onclick="statusFilter.value='New'; applyFilters();" style="cursor: pointer;" title="Click to filter New leads">
+      <div class="metric-card card-new" onclick="setStatusFilter('New')" style="cursor: pointer;" title="Click to filter New leads">
         <span class="metric-label">New Leads</span>
         <span class="metric-val" id="metric-new">{{ stats.new }}</span>
         <span style="font-size: 0.74rem; color: var(--amber);">Awaiting outreach</span>
       </div>
-      <div class="metric-card card-contacted" onclick="statusFilter.value='In Progress'; applyFilters();" style="cursor: pointer;" title="Click to filter In Progress leads">
+      <div class="metric-card card-contacted" onclick="setStatusFilter('In Progress')" style="cursor: pointer;" title="Click to filter In Progress leads">
         <span class="metric-label">In Progress</span>
         <span class="metric-val" id="metric-contacted">{{ stats.contacted }}</span>
         <span style="font-size: 0.74rem; color: #38bdf8;">In Review &amp; Active</span>
       </div>
-      <div class="metric-card card-website" onclick="statusFilter.value='Enrolled'; applyFilters();" style="cursor: pointer;" title="Click to filter Enrolled students">
+      <div class="metric-card card-website" onclick="setStatusFilter('Enrolled')" style="cursor: pointer;" title="Click to filter Enrolled students">
         <span class="metric-label">Enrolled / Converted</span>
         <span class="metric-val" id="metric-enrolled">{{ stats.enrolled }}</span>
         <span style="font-size: 0.74rem; color: #4ade80;">
-          💻 Tech: {{ stats.tech_enrolled }} · 📊 Non-Tech: {{ stats.nontech_enrolled }}
+          <span onclick="event.stopPropagation(); setQuickFilter('', 'tech'); setStatusFilter('Enrolled');" style="text-decoration: underline; cursor: pointer;" title="Filter Enrolled Tech Students">💻 Tech: {{ stats.tech_enrolled }}</span> · 
+          <span onclick="event.stopPropagation(); setQuickFilter('', 'nontech'); setStatusFilter('Enrolled');" style="text-decoration: underline; cursor: pointer;" title="Filter Enrolled Non-Tech Students">📊 Non-Tech: {{ stats.nontech_enrolled }}</span>
         </span>
       </div>
     </div>
@@ -1254,24 +1135,24 @@
       <!-- Toolbar: Two Options (Internship & Projects) with Tech & Non-Tech and Live Status -->
       <div class="toolbar-card">
         <div class="filter-group">
-          <input type="text" id="search-input" class="toolbar-input" placeholder="🔍 Search name, email, college, domain..." value="{{ search or '' }}">
+          <input type="text" id="search-input" class="toolbar-input" placeholder="🔍 Search name, email, college, domain..." value="{{ search or '' }}" oninput="applyFilters()">
 
           <!-- OPTION 1: Internship vs Projects with Enrolled count -->
-          <select id="category-filter" class="toolbar-select">
+          <select id="category-filter" class="toolbar-select" onchange="applyFilters()">
             <option value="">All Services (Total: {{ stats.total }} · Enrolled: {{ stats.enrolled }})</option>
             <option value="internship" {% if category_filter == 'internship' %}selected{% endif %}>🎓 Internship (Total: {{ stats.internship_total }} · Enrolled: {{ stats.internship_enrolled }})</option>
             <option value="projects" {% if category_filter == 'projects' %}selected{% endif %}>📁 Projects (Total: {{ stats.projects_total }} · Enrolled: {{ stats.projects_enrolled }})</option>
           </select>
 
           <!-- OPTION 2: Tech vs Non-Tech with Enrolled count -->
-          <select id="track-filter" class="toolbar-select">
+          <select id="track-filter" class="toolbar-select" onchange="applyFilters()">
             <option value="">All Tracks (Total: {{ stats.total }} · Enrolled: {{ stats.enrolled }})</option>
             <option value="tech" {% if track_filter == 'tech' %}selected{% endif %}>💻 Tech (Total: {{ stats.tech_total }} · Enrolled: {{ stats.tech_enrolled }})</option>
             <option value="nontech" {% if track_filter == 'nontech' %}selected{% endif %}>📊 Non-Tech (Total: {{ stats.nontech_total }} · Enrolled: {{ stats.nontech_enrolled }})</option>
           </select>
 
           <!-- OPTION 3: Statuses with Live Counts -->
-          <select id="status-filter" class="toolbar-select">
+          <select id="status-filter" class="toolbar-select" onchange="applyFilters()">
             <option value="">All Statuses ({{ stats.total }})</option>
             <option value="New" {% if status_filter == 'New' %}selected{% endif %}>New ({{ stats.new }})</option>
             <option value="Contacted" {% if status_filter == 'Contacted' %}selected{% endif %}>Contacted ({{ stats.contacted }})</option>
@@ -1305,42 +1186,14 @@
         </div>
       </div>
 
-      <!-- Interactive Clickable Filter Bar: Service Options & Tracks -->
-      <div class="interactive-filter-bar">
-        <div class="filter-btn-group">
-          <span class="filter-group-title">SERVICE OPTION:</span>
-          <button type="button" class="filter-tab-pill filter-pill-cat active" data-value="" onclick="setCategoryFilter('')">All Services</button>
-          <button type="button" class="filter-tab-pill filter-pill-cat" data-value="internship" onclick="setCategoryFilter('internship')">🎓 Internship</button>
-          <button type="button" class="filter-tab-pill filter-pill-cat" data-value="projects" onclick="setCategoryFilter('projects')">📁 Projects</button>
-        </div>
-
-        <div class="filter-divider-v"></div>
-
-        <div class="filter-btn-group">
-          <span class="filter-group-title">TRACK:</span>
-          <button type="button" class="filter-tab-pill filter-pill-track active" data-value="" onclick="setTrackFilter('')">All Tracks</button>
-          <button type="button" class="filter-tab-pill filter-pill-track" data-value="tech" onclick="setTrackFilter('tech')">💻 Tech</button>
-          <button type="button" class="filter-tab-pill filter-pill-track" data-value="nontech" onclick="setTrackFilter('nontech')">📊 Non-Tech</button>
-        </div>
-      </div>
-
-      <!-- Live Dynamic Filter Status Summary Bar -->
-      <div class="filter-status-bar" id="filter-status-bar">
-        <div class="filter-status-info">
-          <span class="filter-status-tag">⚡ LIVE FILTER</span>
-          <span id="summary-total-count" class="filter-status-text">Showing <strong>{{ enquiries|length }}</strong> inquiries</span>
-          <span class="filter-status-divider">•</span>
-          <span id="summary-enrolled-count" class="filter-status-enrolled">🎓 <strong>{{ stats.enrolled }}</strong> Enrolled in selection</span>
-          <span class="filter-status-divider" id="filter-status-active-divider" style="display: none;">•</span>
-          <span id="filter-status-active-desc" class="filter-status-active-desc" style="display: none;"></span>
-        </div>
-        <button type="button" id="btn-reset-filters" class="btn-reset-filters" onclick="resetAllFilters()">
-          ↺ Reset Filters
-        </button>
-      </div>
-
       <!-- Leads Table -->
       <div class="table-card">
+        <div class="table-meta-bar">
+          <div>
+            Showing <strong id="filter-shown-count" style="color: #ffffff;">{{ enquiries|length }}</strong> inquiries · <strong id="filter-enrolled-count" style="color: #4ade80;">🎓 {{ stats.enrolled }} Enrolled</strong>
+          </div>
+          <div id="filter-active-summary" style="display: none; color: var(--cyan); font-weight: 600; font-size: 0.78rem;"></div>
+        </div>
         <div class="table-responsive">
           <table>
             <thead>
@@ -2546,12 +2399,12 @@
     /* ===================================================================
        FILTER & SEARCH TRIGGERS (Instant Live In-DOM Filtering + Sync)
        =================================================================== */
-    const searchInput = document.getElementById('search-input');
-    const categoryFilter = document.getElementById('category-filter');
-    const trackFilter = document.getElementById('track-filter');
-    const statusFilter = document.getElementById('status-filter');
-
     function applyFilters() {
+      const searchInput = document.getElementById('search-input');
+      const categoryFilter = document.getElementById('category-filter');
+      const trackFilter = document.getElementById('track-filter');
+      const statusFilter = document.getElementById('status-filter');
+
       const q = searchInput ? searchInput.value.trim().toLowerCase() : '';
       const cat = categoryFilter ? categoryFilter.value.trim().toLowerCase() : '';
       const tr = trackFilter ? trackFilter.value.trim().toLowerCase() : '';
@@ -2589,42 +2442,31 @@
         emptyRow.style.display = (visibleCount === 0) ? '' : 'none';
       }
 
-      // Update badge counts and summary strip
+      // Update badge counts and counters
       const badgeLeadsCount = document.getElementById('badge-leads-count');
       if (badgeLeadsCount) badgeLeadsCount.textContent = visibleCount;
 
-      const summaryTotal = document.getElementById('summary-total-count');
-      if (summaryTotal) summaryTotal.innerHTML = `Showing <strong>${visibleCount}</strong> inquiries`;
+      const shownCount = document.getElementById('filter-shown-count');
+      if (shownCount) shownCount.textContent = visibleCount;
 
-      const summaryEnrolled = document.getElementById('summary-enrolled-count');
-      if (summaryEnrolled) summaryEnrolled.innerHTML = `🎓 <strong>${enrolledCount}</strong> Enrolled in selection`;
+      const enrolledCountEl = document.getElementById('filter-enrolled-count');
+      if (enrolledCountEl) enrolledCountEl.textContent = `🎓 ${enrolledCount} Enrolled`;
 
-      // Update pill active classes
-      document.querySelectorAll('.filter-pill-cat').forEach(btn => {
-        btn.classList.toggle('active', (btn.dataset.value || '').toLowerCase() === cat);
-      });
-      document.querySelectorAll('.filter-pill-track').forEach(btn => {
-        btn.classList.toggle('active', (btn.dataset.value || '').toLowerCase() === tr);
-      });
+      const summaryTag = document.getElementById('filter-active-summary');
+      if (summaryTag) {
+        const activeParts = [];
+        if (cat) activeParts.push(cat === 'internship' ? '🎓 Internship' : '📁 Projects');
+        if (tr) activeParts.push(tr === 'tech' ? '💻 Tech' : '📊 Non-Tech');
+        if (st) activeParts.push(`Status: ${st}`);
+        if (q) activeParts.push(`"${q}"`);
 
-      // Update active filter pill description
-      const descEl = document.getElementById('filter-status-active-desc');
-      const divEl = document.getElementById('filter-status-active-divider');
-      const parts = [];
-      if (cat) parts.push(cat === 'internship' ? '🎓 Internship' : '📁 Projects');
-      if (tr) parts.push(tr === 'tech' ? '💻 Tech' : '📊 Non-Tech');
-      if (st) parts.push(`Status: ${st.toUpperCase()}`);
-      if (q) parts.push(`Search: "${q}"`);
-
-      if (parts.length > 0) {
-        if (descEl) {
-          descEl.style.display = '';
-          descEl.textContent = `Filtered by: ${parts.join(' + ')}`;
+        if (activeParts.length > 0) {
+          summaryTag.textContent = `Filtered by: ${activeParts.join(' · ')}`;
+          summaryTag.style.display = 'inline-block';
+        } else {
+          summaryTag.textContent = '';
+          summaryTag.style.display = 'none';
         }
-        if (divEl) divEl.style.display = '';
-      } else {
-        if (descEl) descEl.style.display = 'none';
-        if (divEl) divEl.style.display = 'none';
       }
 
       // Sync URL query string smoothly without reload
@@ -2641,46 +2483,85 @@
     }
 
     function setCategoryFilter(val) {
-      if (categoryFilter) {
-        categoryFilter.value = val;
+      const el = document.getElementById('category-filter');
+      if (el) {
+        el.value = val || '';
         applyFilters();
       }
     }
 
     function setTrackFilter(val) {
-      if (trackFilter) {
-        trackFilter.value = val;
+      const el = document.getElementById('track-filter');
+      if (el) {
+        el.value = val || '';
+        applyFilters();
+      }
+    }
+
+    function setStatusFilter(val) {
+      const el = document.getElementById('status-filter');
+      if (el) {
+        el.value = val || '';
         applyFilters();
       }
     }
 
     function setQuickFilter(cat, tr) {
-      if (categoryFilter) categoryFilter.value = cat;
-      if (trackFilter) trackFilter.value = tr;
+      const catEl = document.getElementById('category-filter');
+      const trEl = document.getElementById('track-filter');
+      if (catEl) catEl.value = cat || '';
+      if (trEl) trEl.value = tr || '';
       applyFilters();
     }
 
     function resetAllFilters() {
-      if (searchInput) searchInput.value = '';
-      if (categoryFilter) categoryFilter.value = '';
-      if (trackFilter) trackFilter.value = '';
-      if (statusFilter) statusFilter.value = '';
+      const s = document.getElementById('search-input');
+      const c = document.getElementById('category-filter');
+      const t = document.getElementById('track-filter');
+      const st = document.getElementById('status-filter');
+      if (s) s.value = '';
+      if (c) c.value = '';
+      if (t) t.value = '';
+      if (st) st.value = '';
       applyFilters();
     }
 
+    const searchInputEl = document.getElementById('search-input');
+    const categoryFilterEl = document.getElementById('category-filter');
+    const trackFilterEl = document.getElementById('track-filter');
+    const statusFilterEl = document.getElementById('status-filter');
+
     let debounceTimer;
-    if (searchInput) {
-      searchInput.addEventListener('input', () => {
+    if (searchInputEl) {
+      searchInputEl.addEventListener('input', () => {
         clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(applyFilters, 120);
+        debounceTimer = setTimeout(applyFilters, 100);
       });
     }
 
-    if (categoryFilter) categoryFilter.addEventListener('change', applyFilters);
-    if (trackFilter) trackFilter.addEventListener('change', applyFilters);
-    if (statusFilter) statusFilter.addEventListener('change', applyFilters);
+    if (categoryFilterEl) {
+      categoryFilterEl.addEventListener('change', applyFilters);
+      categoryFilterEl.addEventListener('input', applyFilters);
+    }
+    if (trackFilterEl) {
+      trackFilterEl.addEventListener('change', applyFilters);
+      trackFilterEl.addEventListener('input', applyFilters);
+    }
+    if (statusFilterEl) {
+      statusFilterEl.addEventListener('change', applyFilters);
+      statusFilterEl.addEventListener('input', applyFilters);
+    }
 
-    // Initial run on load to align with any query params
+    // Read URL query params on load if present
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has('category') && categoryFilterEl) categoryFilterEl.value = urlParams.get('category');
+      if (urlParams.has('track') && trackFilterEl) trackFilterEl.value = urlParams.get('track');
+      if (urlParams.has('status') && statusFilterEl) statusFilterEl.value = urlParams.get('status');
+      if (urlParams.has('search') && searchInputEl) searchInputEl.value = urlParams.get('search');
+    } catch (err) {}
+
+    // Initial run on load
     document.addEventListener('DOMContentLoaded', applyFilters);
     applyFilters();
   </script>

@@ -230,6 +230,10 @@ def add_security_headers(response):
     response.headers.setdefault("X-Frame-Options", "DENY")
     response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
     response.headers.setdefault("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
+    if request.path.startswith("/admin") or request.endpoint in {"admin_dashboard", "admin_login"}:
+        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
     if request.is_secure:
         response.headers.setdefault("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
     return response
@@ -771,7 +775,7 @@ def admin_dashboard():
     track_filter = request.args.get("track")
     status_filter = request.args.get("status")
     search = request.args.get("search")
-    return render_template(
+    response = make_response(render_template(
         "admin.html",
         enquiries=db.get_all_enquiries(),
         team_members=db.get_all_team_members(),
@@ -783,7 +787,11 @@ def admin_dashboard():
         status_filter=status_filter,
         search=search,
         csrf_token=_csrf_token(),
-    )
+    ))
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
 
 
 @app.post("/admin/export-csv")

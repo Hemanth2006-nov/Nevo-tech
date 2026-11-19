@@ -210,8 +210,9 @@ def test_admin_dashboard_renders_with_tabs_and_data(logged_in_admin):
     assert b"add-lead-category" in res.data
     assert b"add-lead-track" in res.data
     assert b"Quick Find:" not in res.data
-    assert b"filter-status-bar" in res.data
-    assert b"summary-enrolled-count" in res.data
+    assert b"filter-status-bar" not in res.data
+    assert b"interactive-filter-bar" not in res.data
+    assert b"filter-enrolled-count" in res.data
 
 
 def test_category_and_track_filters(logged_in_admin):
