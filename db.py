@@ -611,6 +611,22 @@ def delete_enquiry(enquiry_id):
     return deleted
 
 
+def clear_all_enquiries():
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM enquiries;")
+    if not IS_POSTGRES:
+        try:
+            cur.execute("DELETE FROM sqlite_sequence WHERE name='enquiries';")
+        except Exception:
+            pass
+    _insert_audit(cur, "admin", "all_enquiries_cleared", None, "Purged all inquiry records")
+    conn.commit()
+    cur.close()
+    conn.close()
+    return True
+
+
 # ==============================================================================
 # TEAM MEMBERS / PEOPLE OPERATIONS ("Adding new peoples")
 # ==============================================================================

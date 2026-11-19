@@ -547,6 +547,15 @@ def delete_enquiry_route(enquiry_id):
     return jsonify({"success": True, "message": "Enquiry deleted successfully"})
 
 
+@app.delete("/api/admin/enquiries/clear-all")
+def clear_all_enquiries_route():
+    auth_error = _require_admin()
+    if auth_error:
+        return auth_error
+    db.clear_all_enquiries()
+    return jsonify({"success": True, "message": "All inquiries have been cleared successfully."})
+
+
 # ==============================================================================
 # TEAM MEMBERS API ("Adding new peoples")
 # ==============================================================================

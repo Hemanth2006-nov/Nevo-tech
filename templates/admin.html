@@ -1209,6 +1209,10 @@
             <span>↺ Reset</span>
           </button>
 
+          <button type="button" class="btn-secondary-action" onclick="clearAllEnquiries()" title="Clear and purge all inquiries from dashboard" style="color: #fca5a5; border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.08);">
+            <span>🗑️ Clear All</span>
+          </button>
+
           <button type="button" class="btn-primary-action" onclick="openAddEnquiryModal()">
             <span>+ Add Inquired Person</span>
           </button>
@@ -2204,6 +2208,43 @@
         const row = document.getElementById('lead-row-' + id);
         if (row) row.remove();
         showToast('Enquiry record deleted.');
+      })
+      .catch(err => {
+        showToast(err.message, true);
+      });
+    }
+
+    function clearAllEnquiries() {
+      if (!confirm('Are you sure you want to permanently clear ALL inquiries and leads? This action cannot be undone.')) {
+        return;
+      }
+      fetch('/api/admin/enquiries/clear-all', {
+        method: 'DELETE',
+        headers: {
+          'X-CSRFToken': getCsrfToken()
+        }
+      })
+      .then(async res => {
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || 'Failed to clear inquiries');
+        }
+        showToast('All inquiries have been cleared!');
+        leadsData = [];
+        const tbody = document.getElementById('leads-tbody');
+        if (tbody) {
+          tbody.innerHTML = `
+            <tr id="empty-leads-row">
+              <td colspan="7" style="text-align: center; padding: 3.5rem; color: var(--text-muted);">
+                <div style="font-size: 2rem; margin-bottom: 0.5rem;">📥</div>
+                <div style="font-size: 1.1rem; color: #ffffff; font-weight: 700;">No Inquiries Found</div>
+                <div style="font-size: 0.85rem; margin-top: 0.25rem;">The inquiry database is clean and empty.</div>
+              </td>
+            </tr>
+          `;
+        }
+        applyFilters();
+        setTimeout(() => window.location.reload(), 600);
       })
       .catch(err => {
         showToast(err.message, true);

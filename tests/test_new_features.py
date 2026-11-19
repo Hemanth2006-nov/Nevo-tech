@@ -292,3 +292,29 @@ def test_category_and_track_filters(logged_in_admin):
     dash_res = logged_in_admin.get("/admin/dashboard?category=internship&track=tech")
     assert dash_res.status_code == 200
     assert b"intern.tech@example.com" in dash_res.data
+
+
+def test_clear_all_enquiries(logged_in_admin):
+    # Add an enquiry
+    logged_in_admin.post(
+        "/api/admin/enquiries",
+        json={
+            "fullName": "Temp Candidate",
+            "email": "temp@example.com",
+            "phone": "+91 91234 56789",
+            "service": "Technical Internship Programs",
+            "status": "New"
+        },
+        headers={"X-CSRFToken": "valid-csrf-token"}
+    )
+    # Clear all enquiries
+    res = logged_in_admin.delete(
+        "/api/admin/enquiries/clear-all",
+        headers={"X-CSRFToken": "valid-csrf-token"}
+    )
+    assert res.status_code == 200
+    assert res.get_json()["success"] is True
+    # Verify 0 enquiries
+    get_res = logged_in_admin.get("/api/enquiries")
+    assert get_res.status_code == 200
+    assert len(get_res.get_json()["enquiries"]) == 0
