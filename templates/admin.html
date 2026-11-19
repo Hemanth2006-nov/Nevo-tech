@@ -1165,37 +1165,42 @@
          =================================================================== -->
     <div id="tab-enquiries" class="tab-pane active">
 
-      <!-- Toolbar: Two Options (Internship & Projects) with Tech & Non-Tech -->
+      <!-- Toolbar: Two Options (Internship & Projects) with Tech & Non-Tech and Live Status -->
       <div class="toolbar-card">
         <div class="filter-group">
-          <input type="text" id="search-input" class="toolbar-input" placeholder="🔍 Search by name, email, college, domain..." value="{{ search or '' }}">
+          <input type="text" id="search-input" class="toolbar-input" placeholder="🔍 Search name, email, college, domain..." value="{{ search or '' }}">
 
-          <!-- OPTION 1: Internship vs Projects -->
+          <!-- OPTION 1: Internship vs Projects with Enrolled count -->
           <select id="category-filter" class="toolbar-select">
-            <option value="">All Services (Internship &amp; Projects)</option>
-            <option value="internship" {% if category_filter == 'internship' %}selected{% endif %}>🎓 Internship</option>
-            <option value="projects" {% if category_filter == 'projects' %}selected{% endif %}>📁 Projects</option>
+            <option value="">All Services (Total: {{ stats.total }} · Enrolled: {{ stats.enrolled }})</option>
+            <option value="internship" {% if category_filter == 'internship' %}selected{% endif %}>🎓 Internship (Total: {{ stats.internship_total }} · Enrolled: {{ stats.internship_enrolled }})</option>
+            <option value="projects" {% if category_filter == 'projects' %}selected{% endif %}>📁 Projects (Total: {{ stats.projects_total }} · Enrolled: {{ stats.projects_enrolled }})</option>
           </select>
 
-          <!-- OPTION 2: Tech vs Non-Tech -->
+          <!-- OPTION 2: Tech vs Non-Tech with Enrolled count -->
           <select id="track-filter" class="toolbar-select">
-            <option value="">All Tracks (Tech &amp; Non-Tech)</option>
-            <option value="tech" {% if track_filter == 'tech' %}selected{% endif %}>💻 Tech</option>
-            <option value="nontech" {% if track_filter == 'nontech' %}selected{% endif %}>📊 Non-Tech</option>
+            <option value="">All Tracks (Total: {{ stats.total }} · Enrolled: {{ stats.enrolled }})</option>
+            <option value="tech" {% if track_filter == 'tech' %}selected{% endif %}>💻 Tech (Total: {{ stats.tech_total }} · Enrolled: {{ stats.tech_enrolled }})</option>
+            <option value="nontech" {% if track_filter == 'nontech' %}selected{% endif %}>📊 Non-Tech (Total: {{ stats.nontech_total }} · Enrolled: {{ stats.nontech_enrolled }})</option>
           </select>
 
+          <!-- OPTION 3: Statuses with Live Counts -->
           <select id="status-filter" class="toolbar-select">
-            <option value="">All Statuses</option>
-            <option value="New" {% if status_filter == 'New' %}selected{% endif %}>New</option>
-            <option value="Contacted" {% if status_filter == 'Contacted' %}selected{% endif %}>Contacted</option>
+            <option value="">All Statuses ({{ stats.total }})</option>
+            <option value="New" {% if status_filter == 'New' %}selected{% endif %}>New ({{ stats.new }})</option>
+            <option value="Contacted" {% if status_filter == 'Contacted' %}selected{% endif %}>Contacted ({{ stats.contacted }})</option>
             <option value="In Review" {% if status_filter == 'In Review' %}selected{% endif %}>In Review</option>
             <option value="In Progress" {% if status_filter == 'In Progress' %}selected{% endif %}>In Progress</option>
-            <option value="Enrolled" {% if status_filter == 'Enrolled' %}selected{% endif %}>Enrolled</option>
+            <option value="Enrolled" {% if status_filter == 'Enrolled' %}selected{% endif %}>🎓 Enrolled ({{ stats.enrolled }})</option>
             <option value="Closed" {% if status_filter == 'Closed' %}selected{% endif %}>Closed</option>
           </select>
         </div>
 
         <div class="toolbar-actions">
+          <button type="button" class="btn-secondary-action" onclick="resetAllFilters()" title="Reset all dropdowns and search">
+            <span>↺ Reset</span>
+          </button>
+
           <button type="button" class="btn-primary-action" onclick="openAddEnquiryModal()">
             <span>+ Add Inquired Person</span>
           </button>
@@ -1210,28 +1215,18 @@
         </div>
       </div>
 
-      <!-- Quick Filter Pills: Find Tech & Non-Tech for Internship & Projects with 1-click -->
-      <div class="quick-filter-bar">
-        <span class="quick-filter-label">Quick Find:</span>
-        <button type="button" class="quick-pill-btn {{ 'active' if not category_filter and not track_filter else '' }}" onclick="setQuickFilter('', '')">
-          <span>All Leads</span>
-          <span class="quick-pill-count">{{ stats.total }}</span>
-        </button>
-        <button type="button" class="quick-pill-btn {{ 'active' if category_filter == 'internship' and track_filter == 'tech' else '' }}" onclick="setQuickFilter('internship', 'tech')">
-          <span>🎓 Internship · 💻 Tech</span>
-          <span class="quick-pill-count">{{ stats.internship_tech }}</span>
-        </button>
-        <button type="button" class="quick-pill-btn {{ 'active' if category_filter == 'internship' and track_filter == 'nontech' else '' }}" onclick="setQuickFilter('internship', 'nontech')">
-          <span>🎓 Internship · 📊 Non-Tech</span>
-          <span class="quick-pill-count">{{ stats.internship_nontech }}</span>
-        </button>
-        <button type="button" class="quick-pill-btn {{ 'active' if category_filter == 'projects' and track_filter == 'tech' else '' }}" onclick="setQuickFilter('projects', 'tech')">
-          <span>📁 Projects · 💻 Tech</span>
-          <span class="quick-pill-count">{{ stats.projects_tech }}</span>
-        </button>
-        <button type="button" class="quick-pill-btn {{ 'active' if category_filter == 'projects' and track_filter == 'nontech' else '' }}" onclick="setQuickFilter('projects', 'nontech')">
-          <span>📁 Projects · 📊 Non-Tech</span>
-          <span class="quick-pill-count">{{ stats.projects_nontech }}</span>
+      <!-- Live Dynamic Filter Status Summary Bar -->
+      <div class="filter-status-bar" id="filter-status-bar">
+        <div class="filter-status-info">
+          <span class="filter-status-tag">⚡ LIVE FILTER</span>
+          <span id="summary-total-count" class="filter-status-text">Showing <strong>{{ enquiries|length }}</strong> inquiries</span>
+          <span class="filter-status-divider">•</span>
+          <span id="summary-enrolled-count" class="filter-status-enrolled">🎓 <strong>{{ stats.enrolled }}</strong> Enrolled in selection</span>
+          <span class="filter-status-divider" id="filter-status-active-divider" style="display: none;">•</span>
+          <span id="filter-status-active-desc" class="filter-status-active-desc" style="display: none;"></span>
+        </div>
+        <button type="button" id="btn-reset-filters" class="btn-reset-filters" onclick="resetAllFilters()">
+          ↺ Reset Filters
         </button>
       </div>
 
@@ -1253,7 +1248,12 @@
             <tbody id="leads-tbody">
               {% if enquiries and enquiries|length > 0 %}
                 {% for item in enquiries %}
-                <tr id="lead-row-{{ item.id }}">
+                <tr id="lead-row-{{ item.id }}"
+                    class="lead-data-row"
+                    data-category="{{ 'internship' if 'internship' in item.service|lower else 'projects' }}"
+                    data-track="{{ 'tech' if 'technical' in item.service|lower else 'nontech' }}"
+                    data-status="{{ item.status }}"
+                    data-search="{{ (item.full_name ~ ' ' ~ item.email ~ ' ' ~ item.phone ~ ' ' ~ (item.institution or '') ~ ' ' ~ (item.domain or '') ~ ' ' ~ item.service)|lower }}">
                   <td style="color: var(--cyan); font-weight: 700;">#{{ item.id }}</td>
                   <td>
                     <div class="applicant-name" id="lead-name-{{ item.id }}">{{ item.full_name }}</div>
@@ -1292,7 +1292,7 @@
                       <option value="New" {% if item.status == 'New' %}selected{% endif %}>New</option>
                       <option value="Contacted" {% if item.status == 'Contacted' %}selected{% endif %}>Contacted</option>
                       <option value="In Review" {% if item.status == 'In Review' %}selected{% endif %}>In Review</option>
-                      <option value="In Progress" {% if status_filter == 'In Progress' or item.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                      <option value="In Progress" {% if item.status == 'In Progress' %}selected{% endif %}>In Progress</option>
                       <option value="Enrolled" {% if item.status == 'Enrolled' %}selected{% endif %}>Enrolled</option>
                       <option value="Closed" {% if item.status == 'Closed' %}selected{% endif %}>Closed</option>
                     </select>
@@ -1306,15 +1306,14 @@
                   </td>
                 </tr>
                 {% endfor %}
-              {% else %}
-                <tr id="empty-leads-row">
-                  <td colspan="7" style="text-align: center; padding: 3.5rem; color: var(--text-muted);">
-                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">📥</div>
-                    <div style="font-size: 1.1rem; color: #ffffff; font-weight: 700;">No Inquiries Found</div>
-                    <div style="font-size: 0.85rem; margin-top: 0.25rem;">No leads match the selected Internship / Projects and Tech / Non-Tech filters.</div>
-                  </td>
-                </tr>
               {% endif %}
+              <tr id="empty-leads-row" style="display: {{ 'none' if enquiries and enquiries|length > 0 else '' }};">
+                <td colspan="7" style="text-align: center; padding: 3.5rem; color: var(--text-muted);">
+                  <div style="font-size: 2rem; margin-bottom: 0.5rem;">📥</div>
+                  <div style="font-size: 1.1rem; color: #ffffff; font-weight: 700;">No Inquiries Found</div>
+                  <div style="font-size: 0.85rem; margin-top: 0.25rem;">No leads match the selected Internship / Projects, Track, or Status filter.</div>
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -2082,6 +2081,18 @@
           `;
         }
 
+        // Update dataset on the row for instant live filtering
+        const leadRow = document.getElementById(`lead-row-${id}`);
+        if (leadRow) {
+          const isIntern = payload.service.toLowerCase().includes('internship');
+          const isTech = payload.service.toLowerCase().includes('technical');
+          leadRow.dataset.category = isIntern ? 'internship' : 'projects';
+          leadRow.dataset.track = isTech ? 'tech' : 'nontech';
+          leadRow.dataset.status = payload.status;
+          leadRow.dataset.search = `${payload.fullName} ${payload.email} ${payload.phone} ${payload.institution || ''} ${payload.domain || ''} ${payload.service}`.toLowerCase();
+        }
+        applyFilters();
+
         closeModal('edit-enquiry-modal');
         showToast('Enquiry modified successfully!');
       })
@@ -2149,6 +2160,18 @@
         }
         selectEl.className = 'status-select status-' + newStatus;
         selectEl.dataset.previousStatus = newStatus;
+        
+        // Update dataset on row and leadsData for instant live filtering and counters
+        const leadRow = document.getElementById(`lead-row-${id}`);
+        if (leadRow) {
+          leadRow.dataset.status = newStatus;
+        }
+        const idx = leadsData.findIndex(x => x.id === id);
+        if (idx !== -1) {
+          leadsData[idx].status = newStatus;
+        }
+        applyFilters();
+
         showToast(`Status updated to "${newStatus}"`);
       })
       .catch(err => {
