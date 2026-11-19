@@ -8,7 +8,7 @@
   <link rel="icon" type="image/png" href="assets/nevo-logo-mark.png">
   
   <!-- CSS Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=2.5">
+  <link rel="stylesheet" href="styles.css?v=2.6">
 
   <!-- Three.js from Cloudflare CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -966,9 +966,19 @@
                 <label class="form-label" for="home-institution">College / University / Company</label>
                 <input type="text" id="home-institution" name="institution" class="form-input" placeholder="e.g. VTU / PES University / Bangalore">
               </div>
-              <div class="form-group">
-                <label class="form-label" for="home-domain">Domain / Focus Area</label>
-                <input type="text" id="home-domain" name="domain" class="form-input" placeholder="e.g. Python AI, Power BI, IEEE IoT, Full-Stack">
+              <div class="form-group" id="home-domain-group">
+                <label class="form-label" for="home-domain-select">Internship Track / Focus Domain <span class="req">*</span></label>
+                <select id="home-domain-select" class="form-select domain-select" data-role="domain-select" required>
+                  <option value="" disabled selected>Choose Track (Web / AI / Cloud / Data / Other)...</option>
+                  <option value="Web Development (Full-Stack / Python / MERN)">Web Development (Full-Stack / Python / MERN)</option>
+                  <option value="Artificial Intelligence & Machine Learning (AI / ML)">Artificial Intelligence &amp; Machine Learning (AI / ML)</option>
+                  <option value="Cloud Computing & DevOps">Cloud Computing &amp; DevOps</option>
+                  <option value="Data Science & Analytics">Data Science &amp; Analytics</option>
+                  <option value="Other">Other (Please specify)</option>
+                </select>
+                <div class="domain-other-wrap" id="home-domain-other-wrap" style="display: none;">
+                  <input type="text" id="home-domain-other" class="form-input domain-other-input" data-role="domain-other" placeholder="Please specify your custom track / domain (e.g. Cybersecurity, Blockchain)...">
+                </div>
               </div>
             </div>
 
@@ -1175,7 +1185,7 @@
 
   <!-- Application Logic & 3D WebGL Engines -->
   <script src="ctaScene3d.js"></script>
-  <script src="app.js?v=2.5"></script>
+  <script src="app.js?v=2.6"></script>
   <!-- =================================================================
        GLOBAL QUICK ENQUIRY MODAL (ZERO AMOUNT OPTION)
        ================================================================= -->
@@ -1242,9 +1252,19 @@
             <label class="form-label" for="modal-institution">College / University / Company</label>
             <input type="text" id="modal-institution" name="institution" class="form-input" placeholder="e.g. VTU, PES University, SRM">
           </div>
-          <div class="form-group">
-            <label class="form-label" for="modal-domain">Focus Domain / Track</label>
-            <input type="text" id="modal-domain" name="domain" class="form-input" placeholder="e.g. Full-Stack, AI / ML, Power BI, IoT">
+          <div class="form-group" id="modal-domain-group">
+            <label class="form-label" for="modal-domain-select">Internship Track / Focus Domain <span class="req">*</span></label>
+            <select id="modal-domain-select" class="form-select domain-select" data-role="domain-select" required>
+              <option value="" disabled selected>Choose Track (Web / AI / Cloud / Data / Other)...</option>
+              <option value="Web Development (Full-Stack / Python / MERN)">Web Development (Full-Stack / Python / MERN)</option>
+              <option value="Artificial Intelligence & Machine Learning (AI / ML)">Artificial Intelligence &amp; Machine Learning (AI / ML)</option>
+              <option value="Cloud Computing & DevOps">Cloud Computing &amp; DevOps</option>
+              <option value="Data Science & Analytics">Data Science &amp; Analytics</option>
+              <option value="Other">Other (Please specify)</option>
+            </select>
+            <div class="domain-other-wrap" id="modal-domain-other-wrap" style="display: none;">
+              <input type="text" id="modal-domain-other" class="form-input domain-other-input" data-role="domain-other" placeholder="Please specify your custom track / domain...">
+            </div>
           </div>
         </div>
 

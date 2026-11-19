@@ -794,6 +794,111 @@ document.addEventListener('DOMContentLoaded', () => {
       el.setAttribute('data-lenis-prevent', '');
     });
 
+    // 5 Domain / Track options for each Service (with option 5 being 'Other')
+    const SERVICE_DOMAIN_TRACKS = {
+      "Technical Internship Programs": [
+        "Web Development (Full-Stack / Python / MERN)",
+        "Artificial Intelligence & Machine Learning (AI / ML)",
+        "Cloud Computing & DevOps",
+        "Data Science & Analytics",
+        "Other"
+      ],
+      "Business & Analytics Internship": [
+        "Business Intelligence & Dashboards (Power BI / Tableau)",
+        "Market Research & Competitive Intelligence",
+        "Financial Modeling & Business Analytics",
+        "Product Management & Strategy Operations",
+        "Other"
+      ],
+      "Customized Technical Projects & Documentation": [
+        "Full-Stack Web & Mobile Application Development",
+        "AI, Machine Learning & Computer Vision Systems",
+        "Cloud Architecture & Microservices Implementation",
+        "Embedded Systems & IoT Hardware Integration",
+        "Other"
+      ],
+      "Survey-Based Projects & Research Reports": [
+        "Consumer Behavior & Market Survey Analysis",
+        "Academic Empirical Studies & Thesis Research",
+        "Statistical Data Analysis (SPSS / R / Python)",
+        "Industry Feasibility & Impact Studies",
+        "Other"
+      ],
+      "General Academic Partnership": [
+        "College Cohort Technical Training",
+        "Faculty Development & Skill Workshops",
+        "Student Hackathons & Capstone Incubation",
+        "Curriculum & Lab Infrastructure Modernization",
+        "Other"
+      ],
+      "General Consultation": [
+        "College Cohort Technical Training",
+        "Faculty Development & Skill Workshops",
+        "Student Hackathons & Capstone Incubation",
+        "Curriculum & Lab Infrastructure Modernization",
+        "Other"
+      ]
+    };
+
+    function getOtherPlaceholder(serviceName) {
+      if (serviceName && serviceName.includes("Technical")) {
+        return "Please specify your custom track (e.g. Cybersecurity, Blockchain, Embedded)...";
+      }
+      if (serviceName && serviceName.includes("Business")) {
+        return "Please specify your business or analytics focus area...";
+      }
+      if (serviceName && serviceName.includes("Customized")) {
+        return "Please specify your project scope or hardware / tech stack...";
+      }
+      if (serviceName && serviceName.includes("Survey")) {
+        return "Please specify your research domain or survey topic...";
+      }
+      return "Please specify your custom track / domain...";
+    }
+
+    function updateDomainOptions(form, serviceName) {
+      if (!form) return;
+      const domainSelect = form.querySelector('[data-role="domain-select"]');
+      const otherWrap = form.querySelector('.domain-other-wrap');
+      const otherInput = form.querySelector('[data-role="domain-other"]');
+      if (!domainSelect) return;
+
+      const tracks = SERVICE_DOMAIN_TRACKS[serviceName] || SERVICE_DOMAIN_TRACKS["Technical Internship Programs"];
+      const currentVal = domainSelect.value;
+
+      domainSelect.innerHTML = '';
+      const defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.disabled = true;
+      defaultOption.selected = true;
+      defaultOption.textContent = 'Choose Track / Specialization...';
+      domainSelect.appendChild(defaultOption);
+
+      tracks.forEach(track => {
+        const opt = document.createElement('option');
+        opt.value = track;
+        opt.textContent = track === 'Other' ? 'Other (Please specify)' : track;
+        domainSelect.appendChild(opt);
+      });
+
+      if (currentVal && tracks.includes(currentVal)) {
+        domainSelect.value = currentVal;
+      } else {
+        domainSelect.value = '';
+      }
+
+      if (otherInput) {
+        otherInput.placeholder = getOtherPlaceholder(serviceName);
+      }
+
+      if (domainSelect.value === 'Other') {
+        if (otherWrap) otherWrap.style.display = 'block';
+      } else {
+        if (otherWrap) otherWrap.style.display = 'none';
+        if (otherInput) otherInput.value = '';
+      }
+    }
+
     window.openEnquiryModal = function(serviceName) {
       if (!modal) return;
 
@@ -813,13 +918,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (selectWrap) selectWrap.style.display = 'none';
         if (selectEl) selectEl.disabled = true;
+        updateDomainOptions(modal.querySelector('form'), serviceName);
       } else {
         // Fallback only if opened without a specific service
         if (lockedWrap) lockedWrap.style.display = 'none';
         if (hiddenInput) hiddenInput.disabled = true;
         if (selectWrap) {
           selectWrap.style.display = 'block';
-          if (selectEl) selectEl.disabled = false;
+          if (selectEl) {
+            selectEl.disabled = false;
+            updateDomainOptions(modal.querySelector('form'), selectEl.value);
+          }
         }
       }
 
@@ -847,13 +956,34 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (homeSelectWrap) homeSelectWrap.style.display = 'none';
         if (homeSelect) homeSelect.disabled = true;
+        updateDomainOptions(document.getElementById('main-enquiry-form'), serviceName);
       } else {
         if (homeLockedWrap) homeLockedWrap.style.display = 'none';
         if (homeHiddenInput) homeHiddenInput.disabled = true;
         if (homeSelectWrap) homeSelectWrap.style.display = 'block';
-        if (homeSelect) homeSelect.disabled = false;
+        if (homeSelect) {
+          homeSelect.disabled = false;
+          updateDomainOptions(document.getElementById('main-enquiry-form'), homeSelect.value);
+        }
       }
     };
+
+    // Listen to changes on service selects
+    const homeServiceSelect = document.getElementById('home-service');
+    if (homeServiceSelect) {
+      homeServiceSelect.addEventListener('change', () => {
+        const form = homeServiceSelect.closest('form');
+        updateDomainOptions(form, homeServiceSelect.value);
+      });
+    }
+
+    const modalServiceSelect = modal ? modal.querySelector('#modal-service-select') : null;
+    if (modalServiceSelect) {
+      modalServiceSelect.addEventListener('change', () => {
+        const form = modalServiceSelect.closest('form');
+        updateDomainOptions(form, modalServiceSelect.value);
+      });
+    }
 
     // Check URL parameters for preselected service
     try {
@@ -918,6 +1048,51 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Wire up all .nevo-enquiry-form forms across all pages
     enquiryForms.forEach(form => {
+      // Bind domain-select change event to toggle the Other input field
+      const domainSelect = form.querySelector('[data-role="domain-select"]');
+      const otherWrap = form.querySelector('.domain-other-wrap');
+      const otherInput = form.querySelector('[data-role="domain-other"]');
+
+      if (domainSelect) {
+        domainSelect.addEventListener('change', () => {
+          if (domainSelect.value === 'Other') {
+            if (otherWrap) {
+              otherWrap.style.display = 'block';
+              if (otherInput) {
+                otherInput.focus();
+              }
+            }
+          } else {
+            if (otherWrap) {
+              otherWrap.style.display = 'none';
+              if (otherInput) otherInput.value = '';
+            }
+          }
+        });
+      }
+
+      // Populate initial domain options based on assigned or pre-selected service
+      let initialService = '';
+      const hiddenService = form.querySelector('input[type="hidden"][name="service"]');
+      if (hiddenService && !hiddenService.disabled && hiddenService.value) {
+        initialService = hiddenService.value;
+      } else {
+        const selectService = form.querySelector('select[name="service"]');
+        if (selectService && selectService.value) {
+          initialService = selectService.value;
+        }
+      }
+      if (!initialService) {
+        const lockedCardText = form.querySelector('.service-selected-title');
+        if (lockedCardText && lockedCardText.textContent.trim()) {
+          initialService = lockedCardText.textContent.trim();
+        }
+      }
+
+      if (initialService) {
+        updateDomainOptions(form, initialService);
+      }
+
       form.addEventListener('submit', (e) => {
         e.preventDefault();
 
@@ -936,11 +1111,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const formData = new FormData(form);
         const fullName = formData.get('fullName') || 'there';
-        const service = formData.get('service') || 'our programs';
+        let service = formData.get('service') || '';
+        if (!service) {
+          const lockedTitle = form.querySelector('.service-selected-title');
+          if (lockedTitle) service = lockedTitle.textContent.trim();
+        }
+        if (!service) service = 'Technical Internship Programs';
+
         const email = formData.get('email') || '';
         const phone = formData.get('phone') || '';
         const institution = formData.get('institution') || '';
-        const domain = formData.get('domain') || '';
+
+        // Dynamically extract domain from domain-select or custom other input
+        let domain = '';
+        const curDomainSelect = form.querySelector('[data-role="domain-select"]');
+        const curDomainOther = form.querySelector('[data-role="domain-other"]');
+        if (curDomainSelect) {
+          if (curDomainSelect.value === 'Other') {
+            domain = (curDomainOther && curDomainOther.value.trim()) ? curDomainOther.value.trim() : 'Other';
+          } else {
+            domain = curDomainSelect.value || '';
+          }
+        } else {
+          domain = formData.get('domain') || '';
+        }
+
         const message = formData.get('message') || '';
 
         if (form.dataset.turnstileWidgetId && !form.dataset.turnstileToken) {
