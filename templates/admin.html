@@ -1063,32 +1063,20 @@
   <!-- Main Container -->
   <main class="admin-container">
 
-    <!-- KPI Metric Cards (6 metrics with Internship & Projects, Tech & Non-Tech breakdown & Enrolled numbers) -->
+    <!-- KPI Metric Cards -->
     <div class="metrics-grid">
       <div class="metric-card card-total" onclick="resetAllFilters()" style="cursor: pointer;" title="Click to view all inquiries">
         <span class="metric-label">Total Inquiries</span>
         <span class="metric-val" id="metric-total">{{ stats.total }}</span>
-        <span style="font-size: 0.74rem; color: var(--text-muted);">
-          🎓 Enrolled: <strong style="color: #4ade80;">{{ stats.enrolled }}</strong> · Tech: {{ stats.tech_total }} · Non-Tech: {{ stats.nontech_total }}
-        </span>
+        <span style="font-size: 0.74rem; color: var(--text-muted);">All submissions</span>
       </div>
       <div class="metric-card card-enrolled" onclick="setCategoryFilter('internship')" style="cursor: pointer;" title="Click to filter by 🎓 Internships">
         <span class="metric-label">🎓 Internships</span>
         <span class="metric-val" id="metric-internship">{{ stats.internship_total }}</span>
-        <span style="font-size: 0.74rem; color: #4ade80;">
-          🎓 Enrolled: <strong style="color: #4ade80;">{{ stats.internship_enrolled }}</strong> 
-          (<span onclick="event.stopPropagation(); setQuickFilter('internship', 'tech')" style="text-decoration: underline; cursor: pointer;" title="Filter Tech Internships">💻 Tech: {{ stats.internship_tech_enrolled }}</span> · 
-           <span onclick="event.stopPropagation(); setQuickFilter('internship', 'nontech')" style="text-decoration: underline; cursor: pointer;" title="Filter Non-Tech Internships">📊 Non-Tech: {{ stats.internship_nontech_enrolled }}</span>)
-        </span>
       </div>
       <div class="metric-card card-team" onclick="setCategoryFilter('projects')" style="cursor: pointer;" title="Click to filter by 📁 Projects">
         <span class="metric-label">📁 Projects</span>
         <span class="metric-val" id="metric-projects">{{ stats.projects_total }}</span>
-        <span style="font-size: 0.74rem; color: #c084fc;">
-          🎓 Enrolled: <strong style="color: #c084fc;">{{ stats.projects_enrolled }}</strong> 
-          (<span onclick="event.stopPropagation(); setQuickFilter('projects', 'tech')" style="text-decoration: underline; cursor: pointer;" title="Filter Tech Projects">💻 Tech: {{ stats.projects_tech_enrolled }}</span> · 
-           <span onclick="event.stopPropagation(); setQuickFilter('projects', 'nontech')" style="text-decoration: underline; cursor: pointer;" title="Filter Non-Tech Projects">📊 Non-Tech: {{ stats.projects_nontech_enrolled }}</span>)
-        </span>
       </div>
       <div class="metric-card card-new" onclick="setStatusFilter('New')" style="cursor: pointer;" title="Click to filter New leads">
         <span class="metric-label">New Leads</span>
@@ -1103,10 +1091,6 @@
       <div class="metric-card card-website" onclick="setStatusFilter('Enrolled')" style="cursor: pointer;" title="Click to filter Enrolled students">
         <span class="metric-label">Enrolled / Converted</span>
         <span class="metric-val" id="metric-enrolled">{{ stats.enrolled }}</span>
-        <span style="font-size: 0.74rem; color: #4ade80;">
-          <span onclick="event.stopPropagation(); setQuickFilter('', 'tech'); setStatusFilter('Enrolled');" style="text-decoration: underline; cursor: pointer;" title="Filter Enrolled Tech Students">💻 Tech: {{ stats.tech_enrolled }}</span> · 
-          <span onclick="event.stopPropagation(); setQuickFilter('', 'nontech'); setStatusFilter('Enrolled');" style="text-decoration: underline; cursor: pointer;" title="Filter Enrolled Non-Tech Students">📊 Non-Tech: {{ stats.nontech_enrolled }}</span>
-        </span>
       </div>
     </div>
 
