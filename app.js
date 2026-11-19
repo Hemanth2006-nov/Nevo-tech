@@ -366,86 +366,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =================================================================
-  // 9. "WATCH OUR STORY" VIDEO REEL MODAL & TECHNICAL 3D SIMULATION
-  // =================================================================
-  const storyModal = document.getElementById('story-modal');
-  const openStoryBtn = document.getElementById('open-story-modal');
-  const closeStoryBtn = document.getElementById('close-story-modal');
-
-  let storySceneInitialized = false;
-  function initStoryTechnicalCanvas() {
-    if (storySceneInitialized) return;
-    const canvas = document.getElementById('story-neural-canvas');
-    if (!canvas || typeof THREE === 'undefined') return;
-
-    storySceneInitialized = true;
-    const container = document.getElementById('tech-story-3d-canvas');
-    const w = (container ? container.clientWidth : 650) || 650;
-    const h = 210;
-
-    const sScene = new THREE.Scene();
-    const sCam = new THREE.PerspectiveCamera(45, w / h, 0.1, 100);
-    sCam.position.set(0, 4, 18);
-    sCam.lookAt(0, 0, 0);
-
-    const sRen = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
-    sRen.setSize(w, h);
-    sRen.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-    // Rotating Technical Lattice
-    const sphereGeo = new THREE.IcosahedronGeometry(4.2, 2);
-    const sphereMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, wireframe: true, transparent: true, opacity: 0.65 });
-    const sphereMesh = new THREE.Mesh(sphereGeo, sphereMat);
-    sScene.add(sphereMesh);
-
-    // Inner glowing core
-    const innerGeo = new THREE.OctahedronGeometry(2.0, 1);
-    const innerMat = new THREE.MeshBasicMaterial({ color: 0x89e3f5, wireframe: false });
-    const innerMesh = new THREE.Mesh(innerGeo, innerMat);
-    sScene.add(innerMesh);
-
-    // Orbital Ring
-    const oRingGeo = new THREE.TorusGeometry(6.2, 0.12, 8, 48);
-    const oRingMat = new THREE.MeshBasicMaterial({ color: 0x10b981, transparent: true, opacity: 0.8 });
-    const oRing = new THREE.Mesh(oRingGeo, oRingMat);
-    oRing.rotation.x = Math.PI / 3;
-    sScene.add(oRing);
-
-    function loopStory() {
-      if (storyModal && storyModal.classList.contains('active')) {
-        sphereMesh.rotation.y += 0.014;
-        sphereMesh.rotation.x += 0.007;
-        innerMesh.rotation.y -= 0.018;
-        oRing.rotation.z += 0.015;
-        sRen.render(sScene, sCam);
-      }
-      requestAnimationFrame(loopStory);
-    }
-    loopStory();
-  }
-
-  if (openStoryBtn && storyModal) {
-    openStoryBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      storyModal.classList.add('active');
-      playSfx('modal');
-      setTimeout(initStoryTechnicalCanvas, 50);
-    });
-  }
-
-  if (closeStoryBtn && storyModal) {
-    closeStoryBtn.addEventListener('click', () => {
-      storyModal.classList.remove('active');
-      playSfx('click');
-    });
-    storyModal.addEventListener('click', (e) => {
-      if (e.target === storyModal) {
-        storyModal.classList.remove('active');
-      }
-    });
-  }
-
-  // =================================================================
   // 10. PROJECT PREVIEW MODAL
   // =================================================================
   const projectModal = document.getElementById('project-modal');
@@ -1221,49 +1141,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initEnquirySuite();
 
   // ===================================================================
-  // 12. DYNAMIC TEAM & MENTORS LOADER (/api/team)
-  // ===================================================================
-  function initDynamicTeam() {
-    const teamGrid = document.getElementById('website-team-grid');
-    if (!teamGrid) return;
-
-    fetch('/api/team')
-      .then(res => res.json())
-      .then(data => {
-        if (!data.success || !Array.isArray(data.team) || data.team.length === 0) return;
-
-        function esc(str) {
-          if (!str) return '';
-          return String(str)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;');
-        }
-
-        teamGrid.innerHTML = data.team.map(m => `
-          <div class="site-team-card">
-            <div>
-              <img src="${esc(m.photo_url || '/assets/mentor-rajesh.svg')}" alt="${esc(m.name)}" class="site-team-avatar-frame" onerror="this.src='/assets/mentor-rajesh.svg'">
-              <h3 class="site-team-name">${esc(m.name)}</h3>
-              <div class="site-team-role">${esc(m.role)}</div>
-              <span class="site-team-dept">${esc(m.department || 'General Track')}</span>
-              <p class="site-team-bio">${esc(m.bio || 'Experienced engineering and academic mentor at NEVO TECH.')}</p>
-            </div>
-            <div class="site-team-social">
-              ${m.email ? `<a href="mailto:${esc(m.email)}" class="site-team-social-btn">✉ Email Mentor</a>` : ''}
-              ${m.linkedin_url ? `<a href="${esc(m.linkedin_url)}" target="_blank" rel="noopener noreferrer" class="site-team-social-btn">🔗 LinkedIn</a>` : ''}
-            </div>
-          </div>
-        `).join('');
-      })
-      .catch(() => {
-        // Fallback already rendered in HTML
-      });
-  }
-
-  // ===================================================================
-  // 13. DYNAMIC WEBSITE SHOWCASE & PHOTOS LOADER (/api/website-items)
+  // 12. DYNAMIC WEBSITE SHOWCASE & PHOTOS LOADER (/api/website-items)
   // ===================================================================
   function initDynamicShowcase() {
     const showcaseGrid = document.getElementById('website-showcase-grid');
@@ -1303,7 +1181,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
   }
 
-  initDynamicTeam();
   initDynamicShowcase();
 
   // Hidden admin access trigger (invisible to visitors: 5 quick clicks on footer copyright)

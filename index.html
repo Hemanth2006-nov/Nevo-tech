@@ -8,7 +8,7 @@
   <link rel="icon" type="image/png" href="assets/nevo-logo-mark.png">
   
   <!-- CSS Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=2.7">
+  <link rel="stylesheet" href="styles.css?v=2.8">
 
   <!-- Three.js from Cloudflare CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -203,7 +203,6 @@
             </ul>
           </li>
           <li><a href="#about" class="nav-link">About</a></li>
-          <li><a href="#team" class="nav-link">Our People</a></li>
           <li><a href="#projects" class="nav-link">Our Work</a></li>
           <li><a href="#showcase" class="nav-link">Showcase</a></li>
           <li><a href="#process" class="nav-link">Process</a></li>
@@ -259,10 +258,6 @@
             <a href="#services" class="btn-pill-highlight">
               Explore Our Services →
             </a>
-            <button id="open-story-modal" class="btn-pill-dark">
-              <span class="play-icon-badge">▶</span>
-              <span>Watch Our Story</span>
-            </button>
           </div>
         </div>
       </div>
@@ -475,80 +470,6 @@
               <h4 class="pillar-title">Our Values</h4>
               <p class="pillar-desc">Hands-on Mastery, Academic Integrity, Technical Rigor, and Measurable Career Growth.</p>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- =================================================================
-       OUR PEOPLE & TECHNICAL MENTORS SECTION (Navy Dark Track)
-       ================================================================= -->
-  <section id="team" class="team-section">
-    <div class="container">
-      <div style="text-align: center; max-width: 760px; margin: 0 auto 3.5rem;">
-        <span class="section-label">— OUR PEOPLE &amp; MENTORS</span>
-        <h2 class="section-title" style="color: #ffffff;">Guided by Industry Pioneers &amp; Research Advisors</h2>
-        <p class="section-desc" style="color: var(--color-accent); margin-top: 0.75rem;">
-          Our programs are designed and led by veteran engineering leads, data scientists, and researchers bringing production-grade mentorship to every student.
-        </p>
-      </div>
-
-      <div class="team-grid" id="website-team-grid">
-        <!-- Rendered by default & synced dynamically via API -->
-        <div class="site-team-card">
-          <div>
-            <img src="assets/mentor-rajesh.svg" alt="Dr. Rajesh Kumar" class="site-team-avatar-frame" onerror="this.src='assets/mentor-rajesh.svg'">
-            <h3 class="site-team-name">Dr. Rajesh Kumar</h3>
-            <div class="site-team-role">Head of AI &amp; Cloud Systems</div>
-            <span class="site-team-dept">Technical Internship Track</span>
-            <p class="site-team-bio">Ex-IISc research scholar with 12+ years specializing in distributed microservices, PyTorch neural models, and container orchestration.</p>
-          </div>
-          <div class="site-team-social">
-            <a href="mailto:rajesh.k@nevotech.in" class="site-team-social-btn">✉ Email Mentor</a>
-            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="site-team-social-btn">🔗 LinkedIn</a>
-          </div>
-        </div>
-
-        <div class="site-team-card">
-          <div>
-            <img src="assets/mentor-ananya.svg" alt="Ananya Sharma" class="site-team-avatar-frame" onerror="this.src='assets/mentor-ananya.svg'">
-            <h3 class="site-team-name">Ananya Sharma</h3>
-            <div class="site-team-role">Director of Business Analytics</div>
-            <span class="site-team-dept">Business &amp; Analytics Track</span>
-            <p class="site-team-bio">Specializes in enterprise customer churn predictive models, PowerBI executive suites, and SQL financial cohort analysis.</p>
-          </div>
-          <div class="site-team-social">
-            <a href="mailto:ananya.s@nevotech.in" class="site-team-social-btn">✉ Email Mentor</a>
-            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="site-team-social-btn">🔗 LinkedIn</a>
-          </div>
-        </div>
-
-        <div class="site-team-card">
-          <div>
-            <img src="assets/mentor-vikram.svg" alt="Vikramaditya Roy" class="site-team-avatar-frame" onerror="this.src='assets/mentor-vikram.svg'">
-            <h3 class="site-team-name">Vikramaditya Roy</h3>
-            <div class="site-team-role">Chief Technical Architect</div>
-            <span class="site-team-dept">Custom Technical Projects</span>
-            <p class="site-team-bio">Oversees end-to-end IoT, embedded robotics, and full-stack systems with rigorous IEEE documentation standards.</p>
-          </div>
-          <div class="site-team-social">
-            <a href="mailto:vikram.r@nevotech.in" class="site-team-social-btn">✉ Email Mentor</a>
-            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="site-team-social-btn">🔗 LinkedIn</a>
-          </div>
-        </div>
-
-        <div class="site-team-card">
-          <div>
-            <img src="assets/mentor-sneha.svg" alt="Sneha Patel" class="site-team-avatar-frame" onerror="this.src='assets/mentor-sneha.svg'">
-            <h3 class="site-team-name">Sneha Patel</h3>
-            <div class="site-team-role">Lead Research Methodologist</div>
-            <span class="site-team-dept">Survey &amp; Research Reports</span>
-            <p class="site-team-bio">Expert in quantitative survey sampling, SPSS regression modeling, structural equation models, and academic publishing.</p>
-          </div>
-          <div class="site-team-social">
-            <a href="mailto:sneha.p@nevotech.in" class="site-team-social-btn">✉ Email Mentor</a>
-            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="site-team-social-btn">🔗 LinkedIn</a>
           </div>
         </div>
       </div>
@@ -1129,55 +1050,8 @@
     </div>
   </footer>
 
-
   <!-- =================================================================
-       MODAL 2: "WATCH OUR STORY" VIDEO REEL MODAL
-       ================================================================= -->
-  <div id="story-modal" class="modal-overlay">
-    <div class="modal-dialog" style="max-width: 780px;">
-      <button id="close-story-modal" class="modal-close-btn" aria-label="Close Video Reel">✕</button>
-      <div class="modal-header">
-        <h3 class="modal-title">NEVO TECH — The Innovation Story</h3>
-        <p class="modal-subtitle">How we mentor future-ready engineers, build customized systems, and conduct empirical research.</p>
-      </div>
-
-      <!-- Technical 3D Neural Architecture Viewer -->
-      <div class="tech-story-viewport" style="background: #090e18; border: 1px solid rgba(137,227,245,0.3); border-radius: 14px; padding: 1.5rem; position: relative; overflow: hidden; min-height: 320px; display: flex; flex-direction: column;">
-        <!-- Top Telemetry Stream -->
-        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:0.75rem; margin-bottom:1rem; font-family:monospace; font-size:0.75rem;">
-          <span style="color:#10b981; display:flex; align-items:center; gap:6px;">
-            <span style="width:7px; height:7px; border-radius:50%; background:#10b981; box-shadow:0 0 8px #10b981;"></span>
-            LIVE SYSTEM TELEMETRY
-          </span>
-          <span style="color:#89e3f5;">INFERENCE: 12ms · 128 TENSOR NODES</span>
-          <span style="color:#f59e0b;">SLA: 99.99%</span>
-        </div>
-
-        <!-- 3D Technical Simulation Canvas Container -->
-        <div id="tech-story-3d-canvas" style="width: 100%; height: 210px; position: relative; border-radius: 8px; overflow: hidden; background: radial-gradient(circle at 50% 50%, #101c30 0%, #060a12 80%);">
-          <canvas id="story-neural-canvas" style="width:100%; height:100%; display:block;"></canvas>
-          <div style="position: absolute; bottom: 10px; left: 12px; font-size: 0.72rem; color: #38bdf8; font-family: monospace;">
-            [ NEVO QUANTUM MATRIX v4.2 ] — Active Optical Bus
-          </div>
-        </div>
-
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1.2rem; flex-wrap:wrap; gap:10px;">
-          <div>
-            <h4 style="font-size: 1.1rem; color: #ffffff;">Hands-On Engineering &amp; Research Excellence</h4>
-            <p style="color: #94a3b8; font-size: 0.82rem; margin-top:2px;">
-              Accelerating career growth through industry mentorship, custom project builds, and publication-ready research reports.
-            </p>
-          </div>
-          <button class="btn-pill-primary" style="padding: 0.5rem 1.2rem; font-size: 0.85rem;" onclick="document.getElementById('story-modal').classList.remove('active')">
-            Close Story
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- =================================================================
-       MODAL 3: PROJECT PREVIEW MODAL
+       MODAL: PROJECT PREVIEW MODAL
        ================================================================= -->
   <div id="project-modal" class="modal-overlay">
     <div class="modal-dialog">
@@ -1209,7 +1083,7 @@
 
   <!-- Application Logic & 3D WebGL Engines -->
   <script src="ctaScene3d.js"></script>
-  <script src="app.js?v=2.7"></script>
+  <script src="app.js?v=2.8"></script>
   <!-- =================================================================
        GLOBAL QUICK ENQUIRY MODAL (ZERO AMOUNT OPTION)
        ================================================================= -->
