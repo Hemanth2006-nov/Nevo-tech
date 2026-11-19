@@ -1,0 +1,22 @@
+<svg width="140" height="140" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad2" x1="0" y1="0" x2="140" y2="140" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0F172A"/>
+      <stop offset="100%" stop-color="#1E293B"/>
+    </linearGradient>
+    <linearGradient id="borderGrad2" x1="0" y1="0" x2="140" y2="140" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#34D399"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+  </defs>
+  <circle cx="70" cy="70" r="68" fill="url(#bgGrad2)" stroke="url(#borderGrad2)" stroke-width="3"/>
+  <circle cx="70" cy="54" r="25" fill="#FCD34D"/>
+  <path d="M42 46 C42 22, 98 22, 98 46 C98 72, 88 82, 86 84 C84 76, 92 60, 92 46 C92 32, 48 32, 48 46 C48 60, 56 76, 54 84 C52 82, 42 72, 42 46 Z" fill="#2E1065"/>
+  <circle cx="61" cy="54" r="3" fill="#18181B"/>
+  <circle cx="79" cy="54" r="3" fill="#18181B"/>
+  <path d="M63 65 Q 70 70, 77 65" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M26 128 C26 98, 46 88, 70 88 C94 88, 114 98, 114 128 Z" fill="#0B132B"/>
+  <polygon points="70,88 61,112 79,112" fill="#34D399"/>
+  <circle cx="106" cy="106" r="15" fill="#10B981" stroke="#FFFFFF" stroke-width="2"/>
+  <text x="106" y="111" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" font-weight="bold" fill="#FFFFFF" text-anchor="middle">BI</text>
+</svg>

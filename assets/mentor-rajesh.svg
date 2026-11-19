@@ -1,0 +1,23 @@
+<svg width="140" height="140" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad1" x1="0" y1="0" x2="140" y2="140" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0F172A"/>
+      <stop offset="100%" stop-color="#1E293B"/>
+    </linearGradient>
+    <linearGradient id="borderGrad1" x1="0" y1="0" x2="140" y2="140" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#0284C7"/>
+    </linearGradient>
+  </defs>
+  <circle cx="70" cy="70" r="68" fill="url(#bgGrad1)" stroke="url(#borderGrad1)" stroke-width="3"/>
+  <circle cx="70" cy="54" r="26" fill="#FBBF24"/>
+  <path d="M44 48 C44 26, 96 26, 96 48 C96 36, 82 28, 70 28 C58 28, 44 36, 44 48 Z" fill="#18181B"/>
+  <circle cx="61" cy="53" r="3" fill="#18181B"/>
+  <circle cx="79" cy="53" r="3" fill="#18181B"/>
+  <path d="M56 46 L66 46 M74 46 L84 46" stroke="#18181B" stroke-width="2" stroke-linecap="round"/>
+  <path d="M63 65 Q 70 70, 77 65" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M26 128 C26 98, 46 88, 70 88 C94 88, 114 98, 114 128 Z" fill="#0B132B"/>
+  <polygon points="70,88 61,112 79,112" fill="#38BDF8"/>
+  <circle cx="106" cy="106" r="15" fill="#0284C7" stroke="#FFFFFF" stroke-width="2"/>
+  <text x="106" y="111" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" font-weight="bold" fill="#FFFFFF" text-anchor="middle">AI</text>
+</svg>

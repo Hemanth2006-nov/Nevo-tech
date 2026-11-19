@@ -1025,6 +1025,92 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize Enquiry Suite
   initEnquirySuite();
 
+  // ===================================================================
+  // 12. DYNAMIC TEAM & MENTORS LOADER (/api/team)
+  // ===================================================================
+  function initDynamicTeam() {
+    const teamGrid = document.getElementById('website-team-grid');
+    if (!teamGrid) return;
+
+    fetch('/api/team')
+      .then(res => res.json())
+      .then(data => {
+        if (!data.success || !Array.isArray(data.team) || data.team.length === 0) return;
+
+        function esc(str) {
+          if (!str) return '';
+          return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+        }
+
+        teamGrid.innerHTML = data.team.map(m => `
+          <div class="site-team-card">
+            <div>
+              <img src="${esc(m.photo_url || '/assets/mentor-rajesh.svg')}" alt="${esc(m.name)}" class="site-team-avatar-frame" onerror="this.src='/assets/mentor-rajesh.svg'">
+              <h3 class="site-team-name">${esc(m.name)}</h3>
+              <div class="site-team-role">${esc(m.role)}</div>
+              <span class="site-team-dept">${esc(m.department || 'General Track')}</span>
+              <p class="site-team-bio">${esc(m.bio || 'Experienced engineering and academic mentor at NEVO TECH.')}</p>
+            </div>
+            <div class="site-team-social">
+              ${m.email ? `<a href="mailto:${esc(m.email)}" class="site-team-social-btn">✉ Email Mentor</a>` : ''}
+              ${m.linkedin_url ? `<a href="${esc(m.linkedin_url)}" target="_blank" rel="noopener noreferrer" class="site-team-social-btn">🔗 LinkedIn</a>` : ''}
+            </div>
+          </div>
+        `).join('');
+      })
+      .catch(() => {
+        // Fallback already rendered in HTML
+      });
+  }
+
+  // ===================================================================
+  // 13. DYNAMIC WEBSITE SHOWCASE & PHOTOS LOADER (/api/website-items)
+  // ===================================================================
+  function initDynamicShowcase() {
+    const showcaseGrid = document.getElementById('website-showcase-grid');
+    if (!showcaseGrid) return;
+
+    fetch('/api/website-items')
+      .then(res => res.json())
+      .then(data => {
+        if (!data.success || !Array.isArray(data.items) || data.items.length === 0) return;
+
+        function esc(str) {
+          if (!str) return '';
+          return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+        }
+
+        showcaseGrid.innerHTML = data.items.map(item => `
+          <div class="site-showcase-card">
+            <div class="site-showcase-media">
+              <img src="${esc(item.photo_url || '/assets/office-render.svg')}" alt="${esc(item.title)}" class="site-showcase-img" onerror="this.src='/assets/office-render.svg'">
+              <span class="site-showcase-badge">${esc(item.badge_text || item.category.toUpperCase())}</span>
+            </div>
+            <div class="site-showcase-body">
+              <span class="site-showcase-category">${esc(item.category)}</span>
+              <h3 class="site-showcase-title">${esc(item.title)}</h3>
+              <p class="site-showcase-desc">${esc(item.description)}</p>
+              ${item.link_url ? `<a href="${esc(item.link_url)}" class="site-showcase-link">Explore Details &rarr;</a>` : ''}
+            </div>
+          </div>
+        `).join('');
+      })
+      .catch(() => {
+        // Fallback already rendered in HTML
+      });
+  }
+
+  initDynamicTeam();
+  initDynamicShowcase();
+
   // Hidden admin access trigger (invisible to visitors: 5 quick clicks on footer copyright)
   const footerCopyright = document.querySelector('.footer-bottom-bar > div:first-child');
   if (footerCopyright) {

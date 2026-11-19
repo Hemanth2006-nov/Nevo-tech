@@ -3555,3 +3555,256 @@ html.lenis, html.lenis body {
     font-size: 0.9rem;
   }
 }
+
+/* ===================================================================
+   DYNAMIC TEAM & MENTORS SECTION (Navy Dark Glassmorphism)
+   =================================================================== */
+.team-section {
+  padding: 6.5rem 0 6rem;
+  background: #080d1a;
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.08) 0%, transparent 45%),
+    radial-gradient(circle at 90% 80%, rgba(192, 132, 252, 0.06) 0%, transparent 45%);
+  position: relative;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-top: 3.5rem;
+}
+
+.site-team-card {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(137, 227, 245, 0.18);
+  border-radius: var(--radius-lg);
+  padding: 2.25rem 1.75rem;
+  text-align: center;
+  backdrop-filter: blur(14px);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
+              border-color 0.3s ease, 
+              box-shadow 0.3s ease;
+  position: relative;
+}
+
+.site-team-card:hover {
+  transform: translateY(-8px);
+  border-color: var(--color-sky);
+  box-shadow: 0 20px 50px rgba(56, 189, 248, 0.2);
+}
+
+.site-team-avatar-frame {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  margin: 0 auto 1.25rem;
+  border: 3px solid var(--color-sky);
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.35);
+  object-fit: cover;
+  background: #0f172a;
+}
+
+.site-team-name {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0.35rem;
+}
+
+.site-team-role {
+  font-size: 0.86rem;
+  color: var(--color-sky);
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.site-team-dept {
+  display: inline-block;
+  margin-top: 0.6rem;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #7dd3fc;
+  letter-spacing: 0.04em;
+}
+
+.site-team-bio {
+  font-size: 0.86rem;
+  color: #94a3b8;
+  line-height: 1.6;
+  margin: 1.25rem 0;
+  text-align: left;
+}
+
+.site-team-social {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.site-team-social-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--color-sky);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  transition: all 0.2s ease;
+}
+
+.site-team-social-btn:hover {
+  background: var(--color-sky);
+  color: #050811;
+}
+
+/* ===================================================================
+   CAMPUS & DELIVERABLES SHOWCASE SECTION (Photos & Details)
+   =================================================================== */
+.showcase-section {
+  padding: 6.5rem 0 6rem;
+  background: #060912;
+  background-image: 
+    radial-gradient(circle at 80% 20%, rgba(56, 189, 248, 0.07) 0%, transparent 45%),
+    radial-gradient(circle at 20% 80%, rgba(37, 211, 102, 0.05) 0%, transparent 45%);
+  position: relative;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.showcase-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2rem;
+  margin-top: 3.5rem;
+}
+
+.site-showcase-card {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(137, 227, 245, 0.18);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(14px);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
+              border-color 0.3s ease, 
+              box-shadow 0.3s ease;
+}
+
+.site-showcase-card:hover {
+  transform: translateY(-8px);
+  border-color: var(--color-sky);
+  box-shadow: 0 20px 50px rgba(56, 189, 248, 0.22);
+}
+
+.site-showcase-media {
+  width: 100%;
+  height: 220px;
+  position: relative;
+  overflow: hidden;
+  background: #0a0f1d;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.site-showcase-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.site-showcase-card:hover .site-showcase-img {
+  transform: scale(1.06);
+}
+
+.site-showcase-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(8, 14, 26, 0.92);
+  border: 1px solid var(--color-sky);
+  color: var(--color-sky);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  letter-spacing: 0.05em;
+  backdrop-filter: blur(8px);
+}
+
+.site-showcase-body {
+  padding: 1.65rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.site-showcase-category {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #c084fc;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.35rem;
+}
+
+.site-showcase-title {
+  font-family: var(--font-heading);
+  font-size: 1.22rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0.65rem;
+  line-height: 1.35;
+}
+
+.site-showcase-desc {
+  font-size: 0.86rem;
+  color: #94a3b8;
+  line-height: 1.6;
+  margin-bottom: 1.35rem;
+  flex: 1;
+}
+
+.site-showcase-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--color-sky);
+  font-size: 0.84rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: gap 0.2s ease, color 0.2s ease;
+  margin-top: auto;
+}
+
+.site-showcase-link:hover {
+  color: #ffffff;
+  gap: 0.65rem;
+}
+
+@media (max-width: 768px) {
+  .team-grid, .showcase-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+

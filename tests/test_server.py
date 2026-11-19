@@ -188,3 +188,98 @@ def test_csv_export_requires_csrf_token(client, monkeypatch):
 def test_unknown_and_private_files_return_404(client):
     assert client.get("/server.py").status_code == 404
     assert client.get("/not-a-real-page").status_code == 404
+
+
+def test_admin_can_modify_enquiry(client, monkeypatch):
+    monkeypatch.setattr(server.db, "update_enquiry", lambda _id, _data: True)
+    with client.session_transaction() as current_session:
+        current_session["is_admin"] = True
+        current_session["_csrf_token"] = "test-csrf-token"
+
+    payload = {
+        "fullName": "Updated Student",
+        "email": "updated@example.com",
+        "phone": "+91 91234 56789",
+        "service": "Technical Internship Programs",
+        "institution": "Updated College",
+        "domain": "AI Systems",
+        "message": "Updated details message",
+        "status": "In Progress",
+        "notes": "Spoke on phone, very interested"
+    }
+
+    resp = client.put(
+        "/api/enquiries/1",
+        json=payload,
+        headers={"X-CSRFToken": "test-csrf-token"}
+    )
+    assert resp.status_code == 200
+    assert resp.get_json()["success"] is True
+
+
+def test_admin_can_add_new_person(client, monkeypatch):
+    monkeypatch.setattr(server.db, "insert_team_member", lambda data: {"id": 10, **data})
+    with client.session_transaction() as current_session:
+        current_session["is_admin"] = True
+        current_session["_csrf_token"] = "test-csrf-token"
+
+    person = {
+        "name": "Dr. Alan Turing",
+        "role": "Chief Scientist",
+        "department": "Artificial Intelligence",
+        "photo_url": "/assets/mentor-rajesh.svg",
+        "bio": "Pioneer of theoretical computer science.",
+        "email": "alan@example.com",
+        "linkedin_url": "https://linkedin.com",
+        "display_order": 1,
+        "is_active": 1
+    }
+
+    resp = client.post(
+        "/api/admin/team",
+        json=person,
+        headers={"X-CSRFToken": "test-csrf-token"}
+    )
+    assert resp.status_code == 201
+    assert resp.get_json()["success"] is True
+    assert resp.get_json()["data"]["name"] == "Dr. Alan Turing"
+
+
+def test_admin_can_add_website_item(client, monkeypatch):
+    monkeypatch.setattr(server.db, "insert_website_item", lambda data: {"id": 5, **data})
+    with client.session_transaction() as current_session:
+        current_session["is_admin"] = True
+        current_session["_csrf_token"] = "test-csrf-token"
+
+    item = {
+        "title": "Quantum Computing Lab",
+        "category": "Lab & Campus",
+        "description": "Exploratory quantum simulator workstations.",
+        "photo_url": "/assets/office-render.svg",
+        "badge_text": "QUANTUM",
+        "link_url": "#projects",
+        "display_order": 5,
+        "is_active": 1
+    }
+
+    resp = client.post(
+        "/api/admin/website-items",
+        json=item,
+        headers={"X-CSRFToken": "test-csrf-token"}
+    )
+    assert resp.status_code == 201
+    assert resp.get_json()["success"] is True
+
+
+def test_public_team_and_website_endpoints(client, monkeypatch):
+    monkeypatch.setattr(server.db, "get_all_team_members", lambda active_only: [{"name": "Test Mentor"}])
+    monkeypatch.setattr(server.db, "get_all_website_items", lambda active_only: [{"title": "Test Showcase"}])
+
+    resp_team = client.get("/api/team")
+    assert resp_team.status_code == 200
+    assert resp_team.get_json()["team"][0]["name"] == "Test Mentor"
+
+    resp_items = client.get("/api/website-items")
+    assert resp_items.status_code == 200
+    assert resp_items.get_json()["items"][0]["title"] == "Test Showcase"
+

@@ -1,4 +1,5 @@
 import csv
+import datetime
 import hmac
 import io
 import json
@@ -21,6 +22,7 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from werkzeug.security import check_password_hash
 from werkzeug.middleware.proxy_fix import ProxyFix
+from werkzeug.utils import secure_filename
 
 load_dotenv()
 
@@ -64,10 +66,22 @@ if IS_PRODUCTION:
     if webhook_url and not webhook_url.startswith("https://"):
         raise RuntimeError("Production LEAD_WEBHOOK_URL must use HTTPS")
 
+UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "assets", "uploads")
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+ALLOWED_IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp", ".svg", ".gif"}
+
+VALID_SERVICES = {
+    "Technical Internship Programs",
+    "Business & Analytics Internship",
+    "Customized Technical Projects & Documentation",
+    "Survey-Based Projects & Research Reports",
+    "General Academic Partnership",
+}
+
 app = Flask(__name__, template_folder="templates", static_folder=None)
 app.secret_key = SECRET_KEY or secrets.token_urlsafe(32)
 app.config.update(
-    MAX_CONTENT_LENGTH=16 * 1024,
+    MAX_CONTENT_LENGTH=16 * 1024 * 1024,
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SECURE=IS_PRODUCTION,
     SESSION_COOKIE_SAMESITE="Lax",
@@ -286,6 +300,44 @@ def internal_server_error(_error):
     return "<!doctype html><title>Server error</title><h1>Something went wrong</h1>", 500
 
 
+# ==============================================================================
+# IMAGE UPLOAD API (Photos for Website & People)
+# ==============================================================================
+
+@app.post("/api/upload-image")
+def upload_image():
+    auth_error = _require_admin()
+    if auth_error:
+        return auth_error
+
+    file = request.files.get("photo") or request.files.get("image") or request.files.get("file")
+    if not file or not file.filename:
+        return jsonify({"success": False, "error": "No image file provided"}), 400
+
+    ext = os.path.splitext(file.filename)[1].lower()
+    if ext not in ALLOWED_IMAGE_EXTENSIONS:
+        return jsonify({
+            "success": False,
+            "error": f"Invalid image format. Allowed formats: {', '.join(sorted(ALLOWED_IMAGE_EXTENSIONS))}"
+        }), 400
+
+    raw_base = os.path.splitext(file.filename)[0]
+    safe_base = secure_filename(raw_base)[:30] or "photo"
+    filename = f"{safe_base}_{secrets.token_hex(4)}{ext}"
+    dest_path = os.path.join(UPLOAD_FOLDER, filename)
+    file.save(dest_path)
+
+    return jsonify({
+        "success": True,
+        "message": "Image uploaded successfully",
+        "url": f"/assets/uploads/{filename}"
+    })
+
+
+# ==============================================================================
+# ENQUIRIES API (Public submission + Admin listing, modifying, and creating)
+# ==============================================================================
+
 @app.post("/api/enquiries")
 @limiter.limit("5 per minute")
 def submit_enquiry():
@@ -317,14 +369,7 @@ def submit_enquiry():
         or not 7 <= len(phone_digits) <= 15
     ):
         return jsonify({"success": False, "error": "Enter a valid phone number."}), 400
-    valid_services = {
-        "Technical Internship Programs",
-        "Business & Analytics Internship",
-        "Customized Technical Projects & Documentation",
-        "Survey-Based Projects & Research Reports",
-        "General Academic Partnership",
-    }
-    if fields["service"] not in valid_services:
+    if fields["service"] not in VALID_SERVICES:
         return jsonify({"success": False, "error": "Select a service."}), 400
     if any(len(fields[field]) > limit for field, limit in (
         ("institution", 160), ("domain", 160), ("message", 4000)
@@ -357,8 +402,18 @@ def list_enquiries():
     return jsonify({"success": True, "enquiries": enquiries})
 
 
+@app.get("/api/enquiries/<int:enquiry_id>")
+def get_single_enquiry(enquiry_id):
+    if not session.get("is_admin"):
+        return jsonify({"success": False, "error": "Unauthorized"}), 401
+    enquiry = db.get_enquiry_by_id(enquiry_id)
+    if not enquiry:
+        return jsonify({"success": False, "error": "Enquiry not found"}), 404
+    return jsonify({"success": True, "enquiry": enquiry})
+
+
 @app.patch("/api/enquiries/<int:enquiry_id>")
-def update_enquiry(enquiry_id):
+def update_enquiry_status_route(enquiry_id):
     auth_error = _require_admin()
     if auth_error:
         return auth_error
@@ -380,6 +435,106 @@ def update_enquiry(enquiry_id):
     return jsonify({"success": True, "message": "Status updated successfully"})
 
 
+@app.put("/api/enquiries/<int:enquiry_id>")
+def modify_enquiry(enquiry_id):
+    auth_error = _require_admin()
+    if auth_error:
+        return auth_error
+
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify({"success": False, "error": "A valid JSON object is required."}), 400
+
+    full_name = str(data.get("fullName", "")).strip()
+    email = str(data.get("email", "")).strip()
+    phone = str(data.get("phone", "")).strip()
+    service = str(data.get("service", "")).strip()
+    institution = str(data.get("institution", "")).strip()
+    domain = str(data.get("domain", "")).strip()
+    message = str(data.get("message", "")).strip()
+    status = str(data.get("status", "New")).strip()
+    notes = str(data.get("notes", "")).strip()
+
+    if not full_name or len(full_name) > 120:
+        return jsonify({"success": False, "error": "Enter a name no longer than 120 characters."}), 400
+    if len(email) > 254 or not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", email):
+        return jsonify({"success": False, "error": "Enter a valid email address."}), 400
+    phone_digits = re.sub(r"\D", "", phone)
+    if not re.fullmatch(r"[0-9+().\-\s]{7,30}", phone) or not 7 <= len(phone_digits) <= 15:
+        return jsonify({"success": False, "error": "Enter a valid phone number."}), 400
+    if service not in VALID_SERVICES:
+        return jsonify({"success": False, "error": "Select a valid service track."}), 400
+
+    allowed_statuses = {"New", "Contacted", "In Review", "In Progress", "Enrolled", "Closed"}
+    if status not in allowed_statuses:
+        return jsonify({"success": False, "error": "Choose a valid enquiry status."}), 400
+    if len(notes) > 4000:
+        return jsonify({"success": False, "error": "Notes must be no longer than 4000 characters."}), 400
+
+    changed = db.update_enquiry(enquiry_id, {
+        "fullName": full_name,
+        "email": email,
+        "phone": phone,
+        "service": service,
+        "institution": institution,
+        "domain": domain,
+        "message": message,
+        "status": status,
+        "notes": notes,
+    })
+    if not changed:
+        return jsonify({"success": False, "error": "Enquiry not found."}), 404
+    return jsonify({"success": True, "message": "Enquiry details updated successfully"})
+
+
+@app.post("/api/admin/enquiries")
+def admin_create_enquiry():
+    auth_error = _require_admin()
+    if auth_error:
+        return auth_error
+
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify({"success": False, "error": "A valid JSON object is required."}), 400
+
+    full_name = str(data.get("fullName", "")).strip()
+    email = str(data.get("email", "")).strip()
+    phone = str(data.get("phone", "")).strip()
+    service = str(data.get("service", "")).strip()
+    institution = str(data.get("institution", "")).strip()
+    domain = str(data.get("domain", "")).strip()
+    message = str(data.get("message", "")).strip()
+    status = str(data.get("status", "New")).strip()
+    notes = str(data.get("notes", "")).strip()
+
+    if not full_name or len(full_name) > 120:
+        return jsonify({"success": False, "error": "Enter a name no longer than 120 characters."}), 400
+    if len(email) > 254 or not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", email):
+        return jsonify({"success": False, "error": "Enter a valid email address."}), 400
+    phone_digits = re.sub(r"\D", "", phone)
+    if not re.fullmatch(r"[0-9+().\-\s]{7,30}", phone) or not 7 <= len(phone_digits) <= 15:
+        return jsonify({"success": False, "error": "Enter a valid phone number."}), 400
+    if service not in VALID_SERVICES:
+        return jsonify({"success": False, "error": "Select a valid service track."}), 400
+
+    allowed_statuses = {"New", "Contacted", "In Review", "In Progress", "Enrolled", "Closed"}
+    if status not in allowed_statuses:
+        status = "New"
+
+    saved = db.create_enquiry_by_admin({
+        "fullName": full_name,
+        "email": email,
+        "phone": phone,
+        "service": service,
+        "institution": institution,
+        "domain": domain,
+        "message": message,
+        "status": status,
+        "notes": notes,
+    })
+    return jsonify({"success": True, "message": "Enquiry added successfully", "data": saved}), 201
+
+
 @app.delete("/api/enquiries/<int:enquiry_id>")
 def delete_enquiry_route(enquiry_id):
     auth_error = _require_admin()
@@ -389,6 +544,160 @@ def delete_enquiry_route(enquiry_id):
         return jsonify({"success": False, "error": "Enquiry not found."}), 404
     return jsonify({"success": True, "message": "Enquiry deleted successfully"})
 
+
+# ==============================================================================
+# TEAM MEMBERS API ("Adding new peoples")
+# ==============================================================================
+
+@app.get("/api/team")
+def get_public_team():
+    team = db.get_all_team_members(active_only=True)
+    return jsonify({"success": True, "team": team})
+
+
+@app.get("/api/admin/team")
+def get_admin_team():
+    if not session.get("is_admin"):
+        return jsonify({"success": False, "error": "Unauthorized"}), 401
+    team = db.get_all_team_members(active_only=False)
+    return jsonify({"success": True, "team": team})
+
+
+@app.post("/api/admin/team")
+def create_team_member():
+    auth_error = _require_admin()
+    if auth_error:
+        return auth_error
+
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify({"success": False, "error": "A valid JSON object is required."}), 400
+
+    name = str(data.get("name", "")).strip()
+    role = str(data.get("role", "")).strip()
+    if not name or len(name) > 120:
+        return jsonify({"success": False, "error": "Enter a name up to 120 characters."}), 400
+    if not role or len(role) > 120:
+        return jsonify({"success": False, "error": "Enter a role/title up to 120 characters."}), 400
+
+    saved = db.insert_team_member(data)
+    return jsonify({"success": True, "message": "Person added successfully", "data": saved}), 201
+
+
+@app.put("/api/admin/team/<int:member_id>")
+def update_team_member_route(member_id):
+    auth_error = _require_admin()
+    if auth_error:
+        return auth_error
+
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify({"success": False, "error": "A valid JSON object is required."}), 400
+
+    name = str(data.get("name", "")).strip()
+    role = str(data.get("role", "")).strip()
+    if not name or len(name) > 120:
+        return jsonify({"success": False, "error": "Enter a name up to 120 characters."}), 400
+    if not role or len(role) > 120:
+        return jsonify({"success": False, "error": "Enter a role/title up to 120 characters."}), 400
+
+    changed = db.update_team_member(member_id, data)
+    if not changed:
+        return jsonify({"success": False, "error": "Person not found."}), 404
+    return jsonify({"success": True, "message": "Person details updated successfully"})
+
+
+@app.delete("/api/admin/team/<int:member_id>")
+def delete_team_member_route(member_id):
+    auth_error = _require_admin()
+    if auth_error:
+        return auth_error
+    if not db.delete_team_member(member_id):
+        return jsonify({"success": False, "error": "Person not found."}), 404
+    return jsonify({"success": True, "message": "Person deleted successfully"})
+
+
+# ==============================================================================
+# WEBSITE DETAILS & PHOTOS (Showcase / Website Items)
+# ==============================================================================
+
+@app.get("/api/website-items")
+def get_public_website_items():
+    items = db.get_all_website_items(active_only=True)
+    return jsonify({"success": True, "items": items})
+
+
+@app.get("/api/admin/website-items")
+def get_admin_website_items():
+    if not session.get("is_admin"):
+        return jsonify({"success": False, "error": "Unauthorized"}), 401
+    items = db.get_all_website_items(active_only=False)
+    return jsonify({"success": True, "items": items})
+
+
+@app.post("/api/admin/website-items")
+def create_website_item():
+    auth_error = _require_admin()
+    if auth_error:
+        return auth_error
+
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify({"success": False, "error": "A valid JSON object is required."}), 400
+
+    title = str(data.get("title", "")).strip()
+    description = str(data.get("description", "")).strip()
+    photo_url = str(data.get("photo_url", "")).strip()
+    if not title or len(title) > 160:
+        return jsonify({"success": False, "error": "Enter a title up to 160 characters."}), 400
+    if not description:
+        return jsonify({"success": False, "error": "Enter a description or details for this item."}), 400
+    if not photo_url:
+        return jsonify({"success": False, "error": "Provide a photo or upload an image."}), 400
+
+    saved = db.insert_website_item(data)
+    return jsonify({"success": True, "message": "Website item added successfully", "data": saved}), 201
+
+
+@app.put("/api/admin/website-items/<int:item_id>")
+def update_website_item_route(item_id):
+    auth_error = _require_admin()
+    if auth_error:
+        return auth_error
+
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify({"success": False, "error": "A valid JSON object is required."}), 400
+
+    title = str(data.get("title", "")).strip()
+    description = str(data.get("description", "")).strip()
+    photo_url = str(data.get("photo_url", "")).strip()
+    if not title or len(title) > 160:
+        return jsonify({"success": False, "error": "Enter a title up to 160 characters."}), 400
+    if not description:
+        return jsonify({"success": False, "error": "Enter a description or details for this item."}), 400
+    if not photo_url:
+        return jsonify({"success": False, "error": "Provide a photo or upload an image."}), 400
+
+    changed = db.update_website_item(item_id, data)
+    if not changed:
+        return jsonify({"success": False, "error": "Website item not found."}), 404
+    return jsonify({"success": True, "message": "Website item updated successfully"})
+
+
+@app.delete("/api/admin/website-items/<int:item_id>")
+def delete_website_item_route(item_id):
+    auth_error = _require_admin()
+    if auth_error:
+        return auth_error
+    if not db.delete_website_item(item_id):
+        return jsonify({"success": False, "error": "Website item not found."}), 404
+    return jsonify({"success": True, "message": "Website item deleted successfully"})
+
+
+# ==============================================================================
+# ADMIN AUTH & DASHBOARD
+# ==============================================================================
 
 @app.route("/admin/login", methods=["GET", "POST"])
 @limiter.limit("5 per minute", methods=["POST"])
@@ -452,6 +761,8 @@ def admin_dashboard():
     return render_template(
         "admin.html",
         enquiries=db.get_all_enquiries(service_filter, status_filter, search),
+        team_members=db.get_all_team_members(),
+        website_items=db.get_all_website_items(),
         stats=db.get_stats(),
         service_filter=service_filter,
         status_filter=status_filter,
