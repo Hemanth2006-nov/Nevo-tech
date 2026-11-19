@@ -1116,10 +1116,6 @@
         <span>👥 Inquiries &amp; Leads</span>
         <span class="tab-badge" id="badge-leads-count">{{ enquiries|length }}</span>
       </button>
-      <button type="button" class="tab-btn" onclick="switchTab('tab-team', this)">
-        <span>🧑‍💼 Our People &amp; Mentors</span>
-        <span class="tab-badge" id="badge-team-count">{{ team_members|length }}</span>
-      </button>
       <button type="button" class="tab-btn" onclick="switchTab('tab-showcase', this)">
         <span>🖼️ Website Content &amp; Photos</span>
         <span class="tab-badge" id="badge-showcase-count">{{ website_items|length }}</span>
@@ -1137,18 +1133,18 @@
         <div class="filter-group">
           <input type="text" id="search-input" class="toolbar-input" placeholder="🔍 Search name, email, college, domain..." value="{{ search or '' }}" oninput="applyFilters()">
 
-          <!-- OPTION 1: Internship vs Projects with Enrolled count -->
+          <!-- OPTION 1: Internship vs Projects -->
           <select id="category-filter" class="toolbar-select" onchange="applyFilters()">
-            <option value="">All Services (Total: {{ stats.total }} · Enrolled: {{ stats.enrolled }})</option>
-            <option value="internship" {% if category_filter == 'internship' %}selected{% endif %}>🎓 Internship (Total: {{ stats.internship_total }} · Enrolled: {{ stats.internship_enrolled }})</option>
-            <option value="projects" {% if category_filter == 'projects' %}selected{% endif %}>📁 Projects (Total: {{ stats.projects_total }} · Enrolled: {{ stats.projects_enrolled }})</option>
+            <option value="">All Services</option>
+            <option value="internship" {% if category_filter == 'internship' %}selected{% endif %}>🎓 Internship</option>
+            <option value="projects" {% if category_filter == 'projects' %}selected{% endif %}>📁 Projects</option>
           </select>
 
-          <!-- OPTION 2: Tech vs Non-Tech with Enrolled count -->
+          <!-- OPTION 2: Tech vs Non-Tech -->
           <select id="track-filter" class="toolbar-select" onchange="applyFilters()">
-            <option value="">All Tracks (Total: {{ stats.total }} · Enrolled: {{ stats.enrolled }})</option>
-            <option value="tech" {% if track_filter == 'tech' %}selected{% endif %}>💻 Tech (Total: {{ stats.tech_total }} · Enrolled: {{ stats.tech_enrolled }})</option>
-            <option value="nontech" {% if track_filter == 'nontech' %}selected{% endif %}>📊 Non-Tech (Total: {{ stats.nontech_total }} · Enrolled: {{ stats.nontech_enrolled }})</option>
+            <option value="">All Tracks</option>
+            <option value="tech" {% if track_filter == 'tech' %}selected{% endif %}>💻 Tech</option>
+            <option value="nontech" {% if track_filter == 'nontech' %}selected{% endif %}>📊 Non-Tech</option>
           </select>
 
           <!-- OPTION 3: Statuses with Live Counts -->
@@ -1164,14 +1160,6 @@
         </div>
 
         <div class="toolbar-actions">
-          <button type="button" class="btn-secondary-action" onclick="resetAllFilters()" title="Reset all dropdowns and search">
-            <span>↺ Reset</span>
-          </button>
-
-          <button type="button" class="btn-secondary-action" onclick="clearAllEnquiries()" title="Clear and purge all inquiries from dashboard" style="color: #fca5a5; border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.08);">
-            <span>🗑️ Clear All</span>
-          </button>
-
           <button type="button" class="btn-primary-action" onclick="openAddEnquiryModal()">
             <span>+ Add Inquired Person</span>
           </button>
@@ -1283,66 +1271,7 @@
     </div>
 
 
-    <!-- ===================================================================
-         TAB 2: OUR PEOPLE & TEAM MEMBERS ("Adding new peoples")
-         =================================================================== -->
-    <div id="tab-team" class="tab-pane">
-      <div class="pane-header">
-        <div class="pane-title-group">
-          <h2>Our People &amp; Mentors</h2>
-          <p>Add, edit, and organize leadership, technical mentors, and researchers displayed on the website.</p>
-        </div>
-        <button type="button" class="btn-primary-action" onclick="openAddTeamModal()">
-          <span>+ Add New Person</span>
-        </button>
-      </div>
 
-      <!-- Team Members Grid -->
-      <div class="cards-grid" id="team-cards-grid">
-        {% if team_members and team_members|length > 0 %}
-          {% for member in team_members %}
-          <div class="grid-card" id="team-card-{{ member.id }}">
-            <div>
-              <div class="team-avatar-container">
-                <img src="{{ member.photo_url or '/assets/mentor-rajesh.svg' }}" alt="{{ member.name }}" class="team-avatar-frame" id="team-img-{{ member.id }}" onerror="this.src='/assets/mentor-rajesh.svg'">
-                <div class="team-header-info">
-                  <h3 class="team-name" id="team-name-{{ member.id }}">{{ member.name }}</h3>
-                  <div class="team-role" id="team-role-{{ member.id }}">{{ member.role }}</div>
-                  <span class="team-dept-pill" id="team-dept-{{ member.id }}">{{ member.department or 'General Track' }}</span>
-                </div>
-              </div>
-
-              <p class="team-bio" id="team-bio-{{ member.id }}">{{ member.bio or 'Experienced professional and academic mentor at NEVO TECH.' }}</p>
-
-              <div class="team-contacts">
-                <div>✉ Email: <a href="mailto:{{ member.email }}" id="team-email-{{ member.id }}">{{ member.email or 'Not listed' }}</a></div>
-                {% if member.linkedin_url %}
-                <div>🔗 LinkedIn: <a href="{{ member.linkedin_url }}" target="_blank" rel="noopener noreferrer">Profile &nearr;</a></div>
-                {% endif %}
-              </div>
-            </div>
-
-            <div class="card-footer-bar">
-              <span class="active-indicator {{ 'active' if member.is_active else 'inactive' }}" id="team-status-{{ member.id }}">
-                <span class="active-dot"></span>
-                <span>{{ 'Visible on Website' if member.is_active else 'Hidden' }}</span>
-              </span>
-              <div class="table-actions">
-                <button type="button" class="btn-action-edit" onclick="openEditTeamModal({{ member.id }})">✏️ Edit</button>
-                <button type="button" class="btn-action-delete" onclick="deleteTeamMember({{ member.id }})">✕</button>
-              </div>
-            </div>
-          </div>
-          {% endfor %}
-        {% else %}
-          <div style="grid-column: 1 / -1; text-align: center; padding: 4rem; background: var(--card-bg); border-radius: 16px; border: 1px solid var(--card-border);">
-            <div style="font-size: 2.2rem; margin-bottom: 0.5rem;">🧑‍💼</div>
-            <div style="font-size: 1.15rem; font-weight: 700; color: #ffffff;">No Team Members Found</div>
-            <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;">Click "+ Add New Person" above to add leadership, mentors, or staff with photos.</div>
-          </div>
-        {% endif %}
-      </div>
-    </div>
 
 
     <!-- ===================================================================

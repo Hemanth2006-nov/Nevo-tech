@@ -198,7 +198,7 @@ def test_admin_dashboard_renders_with_tabs_and_data(logged_in_admin):
     res = logged_in_admin.get("/admin/dashboard")
     assert res.status_code == 200
     assert b"Inquiries &amp; Leads" in res.data
-    assert b"Our People &amp; Mentors" in res.data
+    assert b"Our People &amp; Mentors" not in res.data
     assert b"Website Content &amp; Photos" in res.data
     assert b"Modify Enquired Person" in res.data
     assert b"Add Inquired Person" in res.data
